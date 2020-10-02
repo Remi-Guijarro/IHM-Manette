@@ -6,8 +6,9 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField] float speed = 5f;
     [SerializeField] float impulse = 10f;
-    [SerializeField] float gravity = 9.81f;
+    [SerializeField] float jumpMultiplier = 2f;
     [SerializeField] float fallMultiplier = 1.5f;
+    [SerializeField] float gravity = 9.81f;
 
     bool isGrounded = true;
     float yVelocity;
@@ -55,9 +56,19 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            yVelocity -= gravity * fallMultiplier * Time.deltaTime;
-            print(yVelocity);
+            float yVelocityModifier = gravity * Time.deltaTime;
+            if (yVelocity > 0)
+            {
+                yVelocityModifier *= jumpMultiplier;
+            }
+            if (yVelocity < 0)
+            {
+                yVelocityModifier *= fallMultiplier;
+            }
+            yVelocity -= yVelocityModifier;
         }
+
         transform.position += transform.up * yVelocity * Time.deltaTime;
+
     }
 }
