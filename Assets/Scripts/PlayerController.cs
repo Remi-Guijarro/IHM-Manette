@@ -22,11 +22,11 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
-        rigidbody = GetComponent<Rigidbody2D>();
-        collider = GetComponent<BoxCollider2D>();
+        this.rigidbody = GetComponent<Rigidbody2D>();
+        this.collider = GetComponent<BoxCollider2D>();
         
-        playerHeight = collider.size.y;
-        groundYPosition = transform.position.y - playerHeight / 2;
+        this.playerHeight = collider.size.y;
+        this.groundYPosition = transform.position.y - playerHeight / 2;
     }
 
     void Update()
@@ -45,13 +45,13 @@ public class PlayerController : MonoBehaviour
             Debug.DrawLine(transform.position, hit.point, Color.red);
             if (hit.distance <= Mathf.Epsilon)
             {
-                isGrounded = true;
+                this.isGrounded = true;
                 AdjustYPosition();
             }
             else
             {
-                isGrounded = false;
-                groundYPosition = hit.point.y;
+                this.isGrounded = false;
+                this.groundYPosition = hit.point.y;
             }
         }
     }
@@ -59,49 +59,49 @@ public class PlayerController : MonoBehaviour
     private void AdjustYPosition()
     {
         float feetYPosition = FeetPosition().y;
-        if (feetYPosition < groundYPosition)
+        if (feetYPosition < this.groundYPosition)
         {
-            float groundIntersection = groundYPosition - feetYPosition;
+            float groundIntersection = this.groundYPosition - feetYPosition;
             transform.position += new Vector3(0f, groundIntersection);
         }
     }
 
     private Vector2 FeetPosition()
     {
-        return new Vector2(transform.position.x, transform.position.y - playerHeight / 2f);
+        return new Vector2(transform.position.x, transform.position.y - this.playerHeight / 2f);
     }
 
     private void Jump()
     {
-        if (isGrounded && Input.GetButton("Jump"))
+        if (this.isGrounded && Input.GetButton("Jump"))
         {
-            yVelocity = impulse;
+            this.yVelocity = this.impulse;
         }
         else if (isGrounded)
         {
-            yVelocity = 0;
+            this.yVelocity = 0;
         }
         else
         {
-            float yVelocityModifier = gravity * Time.deltaTime;
-            if (yVelocity > 0)
+            float yVelocityModifier = this.gravity * Time.deltaTime;
+            if (this.yVelocity > 0)
             {
-                yVelocityModifier *= jumpMultiplier;
+                yVelocityModifier *= this.jumpMultiplier;
             }
-            if (yVelocity < 0)
+            if (this.yVelocity < 0)
             {
-                yVelocityModifier *= fallMultiplier;
+                yVelocityModifier *= this.fallMultiplier;
             }
-            yVelocity -= yVelocityModifier;
+            this.yVelocity -= yVelocityModifier;
         }
 
-        transform.position += transform.up * yVelocity * Time.deltaTime;
+        transform.position += transform.up * this.yVelocity * Time.deltaTime;
     }
 
     private void Move()
     {
         float xAxis = Input.GetAxis("Joystick X");
 
-        transform.position += new Vector3(xAxis, 0f) * Time.deltaTime * speed;
+        transform.position += new Vector3(xAxis, 0f) * Time.deltaTime * this.speed;
     }
 }
