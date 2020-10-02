@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour
 
     bool isGrounded = true;
     float yVelocity;
-    float groundYPosition; // Store ground y position below player when jumping
+    float groundYPosition; // Store ground y position below the player
 
     // Cached variables
     Rigidbody2D rigidbody;
@@ -46,7 +46,7 @@ public class PlayerController : MonoBehaviour
             if (hit.distance <= Mathf.Epsilon)
             {
                 isGrounded = true;
-                AdjustYPosition(hit.point.y);
+                AdjustYPosition();
             }
             else
             {
@@ -56,8 +56,9 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void AdjustYPosition(float feetYPosition)
+    private void AdjustYPosition()
     {
+        float feetYPosition = FeetPosition().y;
         if (feetYPosition < groundYPosition)
         {
             float groundIntersection = groundYPosition - feetYPosition;
