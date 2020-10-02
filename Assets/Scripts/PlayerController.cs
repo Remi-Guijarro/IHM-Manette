@@ -31,8 +31,14 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        Vector2 playerFeetPosition = new Vector2(transform.position.x, transform.position.y - playerHeight / 2f);
-        RaycastHit2D hit = Physics2D.Raycast(playerFeetPosition, Vector2.down);
+        CheckGroundContact();
+        Move();
+        Jump();
+    }
+
+    private void CheckGroundContact()
+    {
+        RaycastHit2D hit = Physics2D.Raycast(FeetPosition(), Vector2.down);
 
         if (hit.collider != null)
         {
@@ -40,15 +46,7 @@ public class PlayerController : MonoBehaviour
             if (hit.distance <= Mathf.Epsilon)
             {
                 isGrounded = true;
-                if (hit.point.y < groundYPosition)
-                {
-                    print(groundYPosition);
-                    print(hit.point.y);
-                    float groundIntersection = groundYPosition - hit.point.y;
-                    print(groundIntersection);
-                    transform.position += new Vector3(0f, groundIntersection);
-                }
-                    
+                AdjustYPosition(hit.point.y);
             }
             else
             {
@@ -56,16 +54,28 @@ public class PlayerController : MonoBehaviour
                 groundYPosition = hit.point.y;
             }
         }
+    }
 
-        float xAxis = Input.GetAxis("Joystick X");
+    private void AdjustYPosition(float feetYPosition)
+    {
+        if (feetYPosition < groundYPosition)
+        {
+            float groundIntersection = groundYPosition - feetYPosition;
+            transform.position += new Vector3(0f, groundIntersection);
+        }
+    }
 
-        transform.position += new Vector3(xAxis, 0f) * Time.deltaTime * speed;
+    private Vector2 FeetPosition()
+    {
+        return new Vector2(transform.position.x, transform.position.y - playerHeight / 2f);
+    }
 
+    private void Jump()
+    {
         if (isGrounded && Input.GetButton("Jump"))
         {
             yVelocity = impulse;
         }
-
         else if (isGrounded)
         {
             yVelocity = 0;
@@ -87,8 +97,10 @@ public class PlayerController : MonoBehaviour
         transform.position += transform.up * yVelocity * Time.deltaTime;
     }
 
-    private void FixedUpdate()
+    private void Move()
     {
+        float xAxis = Input.GetAxis("Joystick X");
 
+        transform.position += new Vector3(xAxis, 0f) * Time.deltaTime * speed;
     }
 }
