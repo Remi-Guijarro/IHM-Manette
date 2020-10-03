@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Animations;
 
 public class PlayerController : MonoBehaviour
 {
@@ -19,6 +21,8 @@ public class PlayerController : MonoBehaviour
     bool isGrounded = true;
     float yVelocity;
     float groundYPosition; // Store ground y position below the player
+    bool canDash;
+    float orientation;
 
     // Cached variables
     Rigidbody2D rigidbody;
@@ -33,6 +37,7 @@ public class PlayerController : MonoBehaviour
         this.playerHeight = collider.size.y;
         this.groundYPosition = transform.position.y - playerHeight / 2;
         this.currentDashTime = 0;
+        this.orientation = 1f;
     }
 
     void Update()
@@ -108,6 +113,7 @@ public class PlayerController : MonoBehaviour
     private void Move()
     {
         float xAxis = Input.GetAxis("Joystick X");
+        this.orientation = xAxis == 0 ? this.orientation : (xAxis / Math.Abs(xAxis));
         if (Input.GetButton("Sprint"))
         {
             Move(xAxis, sprintSpeed);
@@ -129,22 +135,24 @@ public class PlayerController : MonoBehaviour
 
     private void Dash()
     {
-        float xAxis = Input.GetAxis("Joystick X");
-        if (Input.GetButtonDown("Dash") && xAxis != 0) {
-            Dash(xAxis);
-        } else {
-            currentDashTime = 0f;
-        }
+        if (Input.GetButtonDown("Dash")) {
+            this.canDash = true;       
+        } if (canDash) {
+            MoveTo(Dash(this.orientation), dashSpeed);
+        }        
     }
 
-    private void Dash(float xAxis)
-    {        
-        while(currentDashTime < dashDuration )
-        {
-            float absoluteMovingDirection = (xAxis / Math.Abs(xAxis));
-            Vector3 moveDirection;  moveDirection = new Vector3((absoluteMovingDirection * dashDistance) * dashIncrement, 0.0f);
-            MoveTo(moveDirection, dashSpeed);
+    private Vector3 Dash(float xAxis)
+    {
+        if (currentDashTime < dashDuration && xAxis != 0) {
+            Vector3 moveDirection;
+            moveDirection = new Vector3((xAxis * dashDistance) * dashIncrement, 0.0f);
             currentDashTime += dashIncrement;
+            return moveDirection;
+        } else {
+            this.canDash = false;
+            currentDashTime = 0f;
+            return Vector3.zero;
         }
     }
 }
