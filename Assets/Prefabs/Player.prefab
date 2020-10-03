@@ -99,7 +99,7 @@ MonoBehaviour:
   speed: 5
   dashDuration: 1
   dashSpeed: 20
-  dashDistance: 2
+  dashDistance: 10
   dashIncrement: 0.5
   sprintSpeed: 15
   impulse: 10
