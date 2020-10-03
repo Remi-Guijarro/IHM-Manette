@@ -40,6 +40,7 @@ public class PlayerController : MonoBehaviour
         CheckGroundContact();
         Move();
         Jump();
+        Dash();
     }
 
     private void CheckGroundContact()
@@ -107,7 +108,6 @@ public class PlayerController : MonoBehaviour
     private void Move()
     {
         float xAxis = Input.GetAxis("Joystick X");
-        Dash(xAxis);
         if (Input.GetButton("Sprint"))
         {
             Move(xAxis, sprintSpeed);
@@ -127,27 +127,24 @@ public class PlayerController : MonoBehaviour
         transform.position += location * speed * Time.deltaTime;
     }
 
+    private void Dash()
+    {
+        float xAxis = Input.GetAxis("Joystick X");
+        if (Input.GetButton("Dash") && xAxis != 0) {
+            Dash(xAxis);
+        } else {
+            currentDashTime = 0f;
+        }
+    }
+
     private void Dash(float xAxis)
     {        
-        if (Input.GetButton("Dash") && xAxis != 0)
+        if (currentDashTime < dashDuration)
         {
-            Vector3 moveDirection;
-            if (currentDashTime < dashDuration)
-            {
-                float absoluteMovingDirection = (xAxis / Math.Abs(xAxis));
-                moveDirection = new Vector3((absoluteMovingDirection * dashDistance) * dashIncrement, 0.0f);
-                Debug.Log(moveDirection);
-                MoveTo(moveDirection, dashSpeed);
-                currentDashTime += dashIncrement;
-            }
-            else
-            {
-                moveDirection = Vector3.zero;
-            }
-        }
-        else
-        {
-            currentDashTime = 0f;
+            float absoluteMovingDirection = (xAxis / Math.Abs(xAxis));
+            Vector3 moveDirection;  moveDirection = new Vector3((absoluteMovingDirection * dashDistance) * dashIncrement, 0.0f);
+            MoveTo(moveDirection, dashSpeed);
+            currentDashTime += dashIncrement;
         }
     }
 }
