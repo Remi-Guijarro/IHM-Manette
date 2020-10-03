@@ -32,6 +32,7 @@ public class PlayerController : MonoBehaviour
         
         this.playerHeight = collider.size.y;
         this.groundYPosition = transform.position.y - playerHeight / 2;
+        this.currentDashTime = 0;
     }
 
     void Update()
