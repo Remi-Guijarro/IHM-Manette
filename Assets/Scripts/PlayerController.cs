@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Animations;
 
 public class PlayerController : MonoBehaviour
 {
@@ -21,8 +20,8 @@ public class PlayerController : MonoBehaviour
     bool isGrounded = true;
     float yVelocity;
     float groundYPosition; // Store ground y position below the player
-    bool canDash;
     float orientation;
+    Queue<Vector3> dashPositions;
 
     // Cached variables
     Rigidbody2D rigidbody;
@@ -38,6 +37,7 @@ public class PlayerController : MonoBehaviour
         this.groundYPosition = transform.position.y - playerHeight / 2;
         this.currentDashTime = 0;
         this.orientation = 1f;
+        this.dashPositions = new Queue<Vector3>();
     }
 
     void Update()
@@ -114,13 +114,17 @@ public class PlayerController : MonoBehaviour
     {
         float xAxis = Input.GetAxis("Joystick X");
         this.orientation = xAxis == 0 ? this.orientation : (xAxis / Math.Abs(xAxis));
-        if (Input.GetButton("Sprint"))
+        if(this.dashPositions.Count <= 0)
         {
-            Move(xAxis, sprintSpeed);
-        } else
-        {
-            Move(xAxis, speed);
-        }
+            if (Input.GetButton("Sprint"))
+            {
+                Move(xAxis, sprintSpeed);
+            }
+            else
+            {
+                Move(xAxis, speed);
+            }
+        }       
     }
 
     private void Move(float xAxis, float desiredSpeed)
@@ -136,9 +140,12 @@ public class PlayerController : MonoBehaviour
     private void Dash()
     {
         if (Input.GetButtonDown("Dash")) {
-            this.canDash = true;       
-        } if (canDash) {
-            MoveTo(Dash(this.orientation), dashSpeed);
+            for (int i = 0; i < (int)(this.dashDuration / dashIncrement); i++)
+            {
+                this.dashPositions.Enqueue(Dash(this.orientation));
+            }
+        } if (this.dashPositions.Count > 0) {
+            MoveTo(this.dashPositions.Dequeue(), dashSpeed);
         }        
     }
 
@@ -150,7 +157,6 @@ public class PlayerController : MonoBehaviour
             currentDashTime += dashIncrement;
             return moveDirection;
         } else {
-            this.canDash = false;
             currentDashTime = 0f;
             return Vector3.zero;
         }
