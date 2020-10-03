@@ -97,7 +97,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 5
+  dashDuration: 1
+  dashSpeed: 20
+  dashDistance: 2
+  dashIncrement: 0.5
+  sprintSpeed: 15
   impulse: 10
+  jumpMultiplier: 2
+  fallMultiplier: 3
   gravity: 9.81
 --- !u!50 &499450975118574932
 Rigidbody2D:
