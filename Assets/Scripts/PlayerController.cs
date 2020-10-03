@@ -135,14 +135,15 @@ public class PlayerController : MonoBehaviour
             if (currentDashTime < dashDuration)
             {
                 float absoluteMovingDirection = (xAxis / Math.Abs(xAxis));
-                moveDirection = new Vector3(absoluteMovingDirection * dashDistance, 0.0f);
+                moveDirection = new Vector3((absoluteMovingDirection * dashDistance) * dashIncrement, 0.0f);
+                Debug.Log(moveDirection);
+                MoveTo(moveDirection, dashSpeed);
                 currentDashTime += dashIncrement;
             }
             else
             {
                 moveDirection = Vector3.zero;
             }
-            MoveTo(moveDirection, dashSpeed);
         }
         else
         {
