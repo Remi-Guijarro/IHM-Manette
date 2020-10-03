@@ -12,14 +12,14 @@ public class PlayerController : MonoBehaviour
         float xAxis = Input.GetAxis("Joystick X");
         if (Input.GetButton("Sprint"))
         {
-            move(xAxis, sprintSpeed);
+            Move(xAxis, sprintSpeed);
         } else
         {
-            move(xAxis, speed);
+            Move(xAxis, speed);
         }        
     }
 
-    private void move(float xAxis, float desiredSpeed)
+    private void Move(float xAxis, float desiredSpeed)
     {
         transform.position += new Vector3(xAxis, 0f) * Time.deltaTime * desiredSpeed;
     }
