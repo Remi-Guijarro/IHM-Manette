@@ -6,6 +6,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] float speed = 5f;
+    [SerializeField] float sprintSpeed = 30f;
     [SerializeField] float impulse = 10f;
     [SerializeField] float jumpMultiplier = 2f;
     [SerializeField] float fallMultiplier = 3f;
@@ -101,7 +102,17 @@ public class PlayerController : MonoBehaviour
     private void Move()
     {
         float xAxis = Input.GetAxis("Joystick X");
+        if (Input.GetButton("Sprint"))
+        {
+            Move(xAxis, sprintSpeed);
+        } else
+        {
+            Move(xAxis, speed);
+        }        
+    }
 
-        transform.position += new Vector3(xAxis, 0f) * Time.deltaTime * this.speed;
+    private void Move(float xAxis, float desiredSpeed)
+    {
+        transform.position += new Vector3(xAxis, 0f) * Time.deltaTime * desiredSpeed;
     }
 }
