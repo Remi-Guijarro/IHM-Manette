@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -108,13 +106,14 @@ public class PlayerController : MonoBehaviour
     private void Move()
     {
         float xAxis = Input.GetAxis("Joystick X");
+        Dash(xAxis);
         if (Input.GetButton("Sprint"))
         {
             Move(xAxis, sprintSpeed);
         } else
         {
             Move(xAxis, speed);
-        }        
+        }
     }
 
     private void Move(float xAxis, float desiredSpeed)
@@ -134,7 +133,9 @@ public class PlayerController : MonoBehaviour
             Vector3 moveDirection;
             if (currentDashTime < dashDuration)
             {
-                moveDirection = new Vector3(xAxis * dashDistance, 0.0f);
+                float absoluteMovingDirection = (xAxis / Math.Abs(xAxis));
+                Debug.Log(absoluteMovingDirection);
+                moveDirection = new Vector3(absoluteMovingDirection * dashDistance, 0.0f);
                 currentDashTime += dashIncrement;
             }
             else
