@@ -130,7 +130,7 @@ public class PlayerController : MonoBehaviour
     private void Dash()
     {
         float xAxis = Input.GetAxis("Joystick X");
-        if (Input.GetButton("Dash") && xAxis != 0) {
+        if (Input.GetButtonDown("Dash") && xAxis != 0) {
             Dash(xAxis);
         } else {
             currentDashTime = 0f;
@@ -139,7 +139,7 @@ public class PlayerController : MonoBehaviour
 
     private void Dash(float xAxis)
     {        
-        if (currentDashTime < dashDuration)
+        while(currentDashTime < dashDuration )
         {
             float absoluteMovingDirection = (xAxis / Math.Abs(xAxis));
             Vector3 moveDirection;  moveDirection = new Vector3((absoluteMovingDirection * dashDistance) * dashIncrement, 0.0f);
