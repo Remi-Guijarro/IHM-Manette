@@ -98,9 +98,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 5
   dashDuration: 1
-  dashSpeed: 20
-  dashDistance: 10
-  dashIncrement: 0.5
+  dashSpeed: 8
+  dashDistance: 200
+  dashIncrement: 0.01
   sprintSpeed: 15
   impulse: 10
   jumpMultiplier: 2
