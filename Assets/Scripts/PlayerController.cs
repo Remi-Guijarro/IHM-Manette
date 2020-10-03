@@ -14,6 +14,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float jumpMultiplier = 2f;
     [SerializeField] float fallMultiplier = 3f;
     [SerializeField] float gravity = 9.81f;
+    [SerializeField] bool moveWhileDashing = false;
 
     
     float currentDashTime;
@@ -114,7 +115,7 @@ public class PlayerController : MonoBehaviour
     {
         float xAxis = Input.GetAxis("Joystick X");
         this.orientation = xAxis == 0 ? this.orientation : (xAxis / Math.Abs(xAxis));
-        if(this.dashPositions.Count <= 0)
+        if(this.dashPositions.Count <= 0 || moveWhileDashing)
         {
             if (Input.GetButton("Sprint"))
             {
