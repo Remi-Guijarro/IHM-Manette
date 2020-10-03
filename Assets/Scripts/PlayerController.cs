@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
-using UnityEngine;
-using UnityEngine.EventSystems;
+﻿using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
@@ -12,10 +7,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float dashSpeed = 20f;
     [SerializeField] float dashDistance = 0.01f;
     [SerializeField] float dashIncrement = 0.5f;
+    
     private float currentDashTime;
 
-
-    // Update is called once per frame
     void Update()
     {
         float xAxis = Input.GetAxis("Joystick X");
