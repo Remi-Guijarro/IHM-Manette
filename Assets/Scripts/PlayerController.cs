@@ -1,17 +1,21 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] float speed = 5f;
+    [SerializeField] float dashDuration = 1f;
+    [SerializeField] float dashSpeed = 20f;
+    [SerializeField] float dashDistance = 0.01f;
+    [SerializeField] float dashIncrement = 0.5f;
     [SerializeField] float sprintSpeed = 30f;
     [SerializeField] float impulse = 10f;
     [SerializeField] float jumpMultiplier = 2f;
     [SerializeField] float fallMultiplier = 3f;
     [SerializeField] float gravity = 9.81f;
 
+    
+    float currentDashTime;
     bool isGrounded = true;
     float yVelocity;
     float groundYPosition; // Store ground y position below the player
@@ -28,6 +32,7 @@ public class PlayerController : MonoBehaviour
         
         this.playerHeight = collider.size.y;
         this.groundYPosition = transform.position.y - playerHeight / 2;
+        this.currentDashTime = 0;
     }
 
     void Update()
@@ -102,17 +107,48 @@ public class PlayerController : MonoBehaviour
     private void Move()
     {
         float xAxis = Input.GetAxis("Joystick X");
+        Dash(xAxis);
         if (Input.GetButton("Sprint"))
         {
             Move(xAxis, sprintSpeed);
         } else
         {
             Move(xAxis, speed);
-        }        
+        }
     }
 
     private void Move(float xAxis, float desiredSpeed)
     {
         transform.position += new Vector3(xAxis, 0f) * Time.deltaTime * desiredSpeed;
     }
+
+    private void MoveTo(Vector3 location, float speed)
+    {
+        transform.position += location * speed * Time.deltaTime;
+    }
+
+    private void Dash(float xAxis)
+    {
+        if (Input.GetButton("Dash"))
+        {
+            Vector3 moveDirection;
+            if (currentDashTime < dashDuration)
+            {
+                float absoluteMovingDirection = (xAxis / Math.Abs(xAxis));
+                Debug.Log(absoluteMovingDirection);
+                moveDirection = new Vector3(absoluteMovingDirection * dashDistance, 0.0f);
+                currentDashTime += dashIncrement;
+            }
+            else
+            {
+                moveDirection = Vector3.zero;
+            }
+            MoveTo(moveDirection, dashSpeed);
+        }
+        else
+        {
+            currentDashTime = 0f;
+        }
+    }
 }
+ 
