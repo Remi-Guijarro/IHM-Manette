@@ -57,17 +57,17 @@ public class PlayerController2D : MonoBehaviour
     /// </summary>
     private void ComputeYVelocity()
     {
-        if (isGrounded)
+        if (this.isGrounded)
         {
-            velocity.y = 0;
+            this.velocity.y = 0;
 
             if (Input.GetButtonDown("Jump"))
             {
-                velocity.y = Mathf.Sqrt(2 * jumpHeight * Mathf.Abs(this.gravity));
+                this.velocity.y = Mathf.Sqrt(2 * this.jumpHeight * Mathf.Abs(this.gravity));
             }
         }
 
-        velocity.y += this.gravity * Time.deltaTime;
+        this.velocity.y += this.gravity * Time.deltaTime;
     }
 
     /// <summary>
@@ -76,7 +76,7 @@ public class PlayerController2D : MonoBehaviour
     /// <param name="hits">The colliders in contact with the player.</param>
     private void ResolveCollisions(Collider2D[] hits)
     {
-        isGrounded = false;
+        this.isGrounded = false;
         foreach (Collider2D hit in hits)
         {
             if (hit != this.collider)
@@ -88,9 +88,9 @@ public class PlayerController2D : MonoBehaviour
                     transform.Translate(colliderDistance.pointA - colliderDistance.pointB);
 
                     // Ground is defined as any surface < 90° with the world up
-                    if (Vector2.Angle(colliderDistance.normal, Vector2.up) < 90 && velocity.y < 0)
+                    if (Vector2.Angle(colliderDistance.normal, Vector2.up) < 90 && this.velocity.y < 0)
                     {
-                        isGrounded = true;
+                        this.isGrounded = true;
                     }
                 }
             }
@@ -103,7 +103,7 @@ public class PlayerController2D : MonoBehaviour
     /// <param name="hits">The colliders overlapping the box.</param>
     private void DetectCollisions(out Collider2D[] hits)
     {
-        hits = Physics2D.OverlapBoxAll(transform.position, collider.size, 0);
+        hits = Physics2D.OverlapBoxAll(transform.position, this.collider.size, 0);
     }
 
     /// <summary>
@@ -116,16 +116,16 @@ public class PlayerController2D : MonoBehaviour
     {
         float xAxis = Input.GetAxis("Joystick X");
 
-        float acceleration = isGrounded ? this.groundAcceleration : airAcceleration;
-        float deceleration = isGrounded ? this.groundDeceleration : 0;
+        float acceleration = this.isGrounded ? this.groundAcceleration : this.airAcceleration;
+        float deceleration = this.isGrounded ? this.groundDeceleration : 0;
 
         if (xAxis != 0f)
         {
-            velocity.x = Mathf.MoveTowards(velocity.x, speed * xAxis, acceleration * Time.deltaTime);
+            this.velocity.x = Mathf.MoveTowards(this.velocity.x, this.speed * xAxis, acceleration * Time.deltaTime);
         }
         else
         {
-            velocity.x = Mathf.MoveTowards(velocity.x, 0, deceleration * Time.deltaTime);
+            this.velocity.x = Mathf.MoveTowards(this.velocity.x, 0, deceleration * Time.deltaTime);
         }
     }
 
