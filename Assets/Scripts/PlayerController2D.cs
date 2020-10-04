@@ -8,16 +8,19 @@ public class PlayerController2D : MonoBehaviour
     float speed = 10f;
 
     [SerializeField, Tooltip("Grounded acceleration when the player moves.")]
-    float acceleration = 50f;
+    float groundAcceleration = 50f;
 
     [SerializeField, Tooltip("Grounded deceleration when the player does not input movement.")]
-    float deceleration = 80f;
+    float groundDeceleration = 80f;
 
     [SerializeField, Tooltip("Maximum height the player will jump regardless of gravity.")]
     float jumpHeight = 5f;
 
     [SerializeField, Tooltip("Gravity applied to the player.")]
     float gravity = -9.81f;
+
+    [SerializeField, Tooltip("Acceleration while in the air.")]
+    float airAcceleration = 30f;
 
     Vector2 velocity;
     bool isGrounded;
@@ -63,6 +66,7 @@ public class PlayerController2D : MonoBehaviour
                 velocity.y = Mathf.Sqrt(2 * jumpHeight * Mathf.Abs(this.gravity));
             }
         }
+
         velocity.y += this.gravity * Time.deltaTime;
     }
 
@@ -104,11 +108,18 @@ public class PlayerController2D : MonoBehaviour
 
     /// <summary>
     /// Calculates the x velocity to be applied.
+    /// 
+    /// Different acceleration and deceleration is applied depending on
+    /// whether the player is in the air or not, giving a better jump feeling.
     /// </summary>
     private void ComputeXVelocity()
     {
         float xAxis = Input.GetAxis("Joystick X");
-        if (xAxis != 0)
+
+        float acceleration = isGrounded ? this.groundAcceleration : airAcceleration;
+        float deceleration = isGrounded ? this.groundDeceleration : 0;
+
+        if (xAxis != 0f)
         {
             velocity.x = Mathf.MoveTowards(velocity.x, speed * xAxis, acceleration * Time.deltaTime);
         }
