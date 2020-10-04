@@ -16,10 +16,11 @@ public class PlayerController2D : MonoBehaviour
     [SerializeField, Tooltip("Maximum height the player will jump regardless of gravity.")]
     float jumpHeight = 5f;
 
-    [SerializeField, Tooltip("Downward gravity applied to the player.")]
-    float gravity = 9.81f;
+    [SerializeField, Tooltip("Gravity applied to the player.")]
+    float gravity = -9.81f;
 
     Vector2 velocity;
+    bool isGrounded;
 
     // Cached variables
     BoxCollider2D collider;
@@ -53,11 +54,16 @@ public class PlayerController2D : MonoBehaviour
     /// </summary>
     private void ComputeYVelocity()
     {
-        if (Input.GetButtonDown("Jump"))
+        if (isGrounded)
         {
-            velocity.y = Mathf.Sqrt(2 * jumpHeight * Mathf.Abs(Physics2D.gravity.y));
+            velocity.y = 0;
+
+            if (Input.GetButtonDown("Jump"))
+            {
+                velocity.y = Mathf.Sqrt(2 * jumpHeight * Mathf.Abs(this.gravity));
+            }
         }
-        velocity.y += Physics2D.gravity.y * Time.deltaTime;
+        velocity.y += this.gravity * Time.deltaTime;
     }
 
     /// <summary>
@@ -66,6 +72,7 @@ public class PlayerController2D : MonoBehaviour
     /// <param name="hits">The colliders in contact with the player.</param>
     private void ResolveCollisions(Collider2D[] hits)
     {
+        isGrounded = false;
         foreach (Collider2D hit in hits)
         {
             if (hit != this.collider)
@@ -75,6 +82,12 @@ public class PlayerController2D : MonoBehaviour
                 if (colliderDistance.isOverlapped)
                 {
                     transform.Translate(colliderDistance.pointA - colliderDistance.pointB);
+
+                    // Ground is defined as any surface < 90° with the world up
+                    if (Vector2.Angle(colliderDistance.normal, Vector2.up) < 90 && velocity.y < 0)
+                    {
+                        isGrounded = true;
+                    }
                 }
             }
         }
