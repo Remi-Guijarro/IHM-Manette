@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -13,12 +14,15 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float jumpMultiplier = 2f;
     [SerializeField] float fallMultiplier = 3f;
     [SerializeField] float gravity = 9.81f;
+    [SerializeField] bool moveWhileDashing = false;
 
     
     float currentDashTime;
     bool isGrounded = true;
     float yVelocity;
     float groundYPosition; // Store ground y position below the player
+    float orientation;
+    Queue<Vector3> dashPositions;
 
     // Cached variables
     Rigidbody2D rigidbody;
@@ -33,6 +37,8 @@ public class PlayerController : MonoBehaviour
         this.playerHeight = collider.size.y;
         this.groundYPosition = transform.position.y - playerHeight / 2;
         this.currentDashTime = 0;
+        this.orientation = 1f;
+        this.dashPositions = new Queue<Vector3>();
     }
 
     void Update()
@@ -40,6 +46,7 @@ public class PlayerController : MonoBehaviour
         CheckGroundContact();
         Move();
         Jump();
+        Dash();
     }
 
     private void CheckGroundContact()
@@ -107,14 +114,18 @@ public class PlayerController : MonoBehaviour
     private void Move()
     {
         float xAxis = Input.GetAxis("Joystick X");
-        Dash(xAxis);
-        if (Input.GetButton("Sprint"))
+        this.orientation = xAxis == 0 ? this.orientation : (xAxis / Math.Abs(xAxis));
+        if(this.dashPositions.Count <= 0 || moveWhileDashing)
         {
-            Move(xAxis, sprintSpeed);
-        } else
-        {
-            Move(xAxis, speed);
-        }
+            if (Input.GetButton("Sprint"))
+            {
+                Move(xAxis, sprintSpeed);
+            }
+            else
+            {
+                Move(xAxis, speed);
+            }
+        }       
     }
 
     private void Move(float xAxis, float desiredSpeed)
@@ -127,26 +138,28 @@ public class PlayerController : MonoBehaviour
         transform.position += location * speed * Time.deltaTime;
     }
 
-    private void Dash(float xAxis)
-    {        
-        if (Input.GetButton("Dash") && xAxis != 0)
-        {
+    private void Dash()
+    {
+        if (Input.GetButtonDown("Dash")) {
+            for (int i = 0; i < (int)(this.dashDuration / dashIncrement); i++)
+            {
+                this.dashPositions.Enqueue(Dash(this.orientation));
+            }
+        } if (this.dashPositions.Count > 0) {
+            MoveTo(this.dashPositions.Dequeue(), dashSpeed);
+        }        
+    }
+
+    private Vector3 Dash(float xAxis)
+    {
+        if (currentDashTime < dashDuration && xAxis != 0) {
             Vector3 moveDirection;
-            if (currentDashTime < dashDuration)
-            {
-                float absoluteMovingDirection = (xAxis / Math.Abs(xAxis));
-                moveDirection = new Vector3(absoluteMovingDirection * dashDistance, 0.0f);
-                currentDashTime += dashIncrement;
-            }
-            else
-            {
-                moveDirection = Vector3.zero;
-            }
-            MoveTo(moveDirection, dashSpeed);
-        }
-        else
-        {
+            moveDirection = new Vector3((xAxis * dashDistance) * dashIncrement, 0.0f);
+            currentDashTime += dashIncrement;
+            return moveDirection;
+        } else {
             currentDashTime = 0f;
+            return Vector3.zero;
         }
     }
 }
