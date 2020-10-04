@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 [RequireComponent(typeof(BoxCollider2D))]
 public class PlayerController2D : MonoBehaviour
@@ -11,6 +12,12 @@ public class PlayerController2D : MonoBehaviour
 
     [SerializeField, Tooltip("Grounded deceleration when the player does not input movement.")]
     float deceleration = 80f;
+
+    [SerializeField, Tooltip("Maximum height the player will jump regardless of gravity.")]
+    float jumpHeight = 5f;
+
+    [SerializeField, Tooltip("Downward gravity applied to the player.")]
+    float gravity = 9.81f;
 
     Vector2 velocity;
 
@@ -25,11 +32,32 @@ public class PlayerController2D : MonoBehaviour
     void Update()
     {
         ComputeXVelocity();
+        ComputeYVelocity();
 
         Collider2D[] hits;
         DetectCollisions(out hits);
         Move();
         ResolveCollisions(hits);
+    }
+
+    /// <summary>
+    /// Calculates the y velocity to be applied.
+    /// 
+    /// Y velocity is based on the following formula:
+    /// a = (vf² - vo²)/2d
+    /// Where : 
+    ///     .a is the acceleration, ie the force of gravity;
+    ///     .vo is the initial velocity, ie the value we want to solve;
+    ///     .vf is the final velocity, ie zero, as there is no motion at the peak of the jump;
+    ///     .d is the distance travelled, ie the jump heigh we want to reach.
+    /// </summary>
+    private void ComputeYVelocity()
+    {
+        if (Input.GetButtonDown("Jump"))
+        {
+            velocity.y = Mathf.Sqrt(2 * jumpHeight * Mathf.Abs(Physics2D.gravity.y));
+        }
+        velocity.y += Physics2D.gravity.y * Time.deltaTime;
     }
 
     /// <summary>
