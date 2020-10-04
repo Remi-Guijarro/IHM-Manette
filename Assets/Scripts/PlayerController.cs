@@ -128,14 +128,13 @@ public class PlayerController : MonoBehaviour
     }
 
     private void Dash(float xAxis)
-    {
-        if (Input.GetButton("Dash"))
+    {        
+        if (Input.GetButton("Dash") && xAxis != 0)
         {
             Vector3 moveDirection;
             if (currentDashTime < dashDuration)
             {
                 float absoluteMovingDirection = (xAxis / Math.Abs(xAxis));
-                Debug.Log(absoluteMovingDirection);
                 moveDirection = new Vector3(absoluteMovingDirection * dashDistance, 0.0f);
                 currentDashTime += dashIncrement;
             }
