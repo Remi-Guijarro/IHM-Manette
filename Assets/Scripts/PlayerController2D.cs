@@ -4,6 +4,7 @@ using System.Xml.Serialization;
 using UnityEditor;
 using UnityEngine;
 
+[RequireComponent(typeof(BoxCollider2D))]
 public class PlayerController2D : MonoBehaviour
 {
     [SerializeField, Tooltip("Maximum speed in u/s.")] 
@@ -18,17 +19,29 @@ public class PlayerController2D : MonoBehaviour
     Vector2 velocity;
 
     // Cached variables
-    Collider2D collider;
+    BoxCollider2D collider;
 
     void Awake()
     {
-        this.collider = GetComponent<Collider2D>();
+        this.collider = GetComponent<BoxCollider2D>();
     }
 
     void Update()
     {
-        ComputeXVelocity(); 
+        ComputeXVelocity();
+
+        Collider2D[] hits;
+        DetectCollisions(out hits);
         Move();
+    }
+
+    /// <summary>
+    /// Detect all collisions with player box collider
+    /// </summary>
+    /// <param name="hits">The colliders overlapping the box</param>
+    private void DetectCollisions(out Collider2D[] hits)
+    {
+        hits = Physics2D.OverlapBoxAll(transform.position, collider.size, 0);
     }
 
     /// <summary>
