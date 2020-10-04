@@ -37,8 +37,14 @@ public class PlayerController2D : MonoBehaviour
     private void ComputeXVelocity()
     {
         float xAxis = Input.GetAxis("Joystick X");
-        print(xAxis);
-        velocity.x = Mathf.MoveTowards(velocity.x, speed * xAxis, acceleration * Time.deltaTime);
+        if (xAxis != 0)
+        {
+            velocity.x = Mathf.MoveTowards(velocity.x, speed * xAxis, acceleration * Time.deltaTime);
+        }
+        else
+        {
+            velocity.x = Mathf.MoveTowards(velocity.x, 0, deceleration * Time.deltaTime);
+        }
     }
 
     /// <summary>
