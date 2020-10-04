@@ -483,6 +483,30 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1177482191, guid: b05129b218949494bbb9dfa3a4dbc62f, type: 3}
+      propertyPath: gravity
+      value: -35
+      objectReference: {fileID: 0}
+    - target: {fileID: 1177482191, guid: b05129b218949494bbb9dfa3a4dbc62f, type: 3}
+      propertyPath: jumpHeight
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1177482191, guid: b05129b218949494bbb9dfa3a4dbc62f, type: 3}
+      propertyPath: speed
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 1177482191, guid: b05129b218949494bbb9dfa3a4dbc62f, type: 3}
+      propertyPath: acceleration
+      value: 75
+      objectReference: {fileID: 0}
+    - target: {fileID: 1177482191, guid: b05129b218949494bbb9dfa3a4dbc62f, type: 3}
+      propertyPath: deceleration
+      value: 70
+      objectReference: {fileID: 0}
+    - target: {fileID: 1177482191, guid: b05129b218949494bbb9dfa3a4dbc62f, type: 3}
+      propertyPath: airAcceleration
+      value: 30
+      objectReference: {fileID: 0}
     - target: {fileID: 6253268407511429645, guid: b05129b218949494bbb9dfa3a4dbc62f,
         type: 3}
       propertyPath: m_Name
