@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Xml.Serialization;
-using UnityEditor;
-using UnityEngine;
+﻿using UnityEngine;
 
 [RequireComponent(typeof(BoxCollider2D))]
 public class PlayerController2D : MonoBehaviour
@@ -33,12 +29,33 @@ public class PlayerController2D : MonoBehaviour
         Collider2D[] hits;
         DetectCollisions(out hits);
         Move();
+        ResolveCollisions(hits);
     }
 
     /// <summary>
-    /// Detect all collisions with player box collider
+    /// Resolves the collisions by pushing the player out of each collider.
     /// </summary>
-    /// <param name="hits">The colliders overlapping the box</param>
+    /// <param name="hits">The colliders in contact with the player.</param>
+    private void ResolveCollisions(Collider2D[] hits)
+    {
+        foreach (Collider2D hit in hits)
+        {
+            if (hit != this.collider)
+            {
+                ColliderDistance2D colliderDistance = hit.Distance(this.collider);
+
+                if (colliderDistance.isOverlapped)
+                {
+                    transform.Translate(colliderDistance.pointA - colliderDistance.pointB);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Detect all collisions with player box collider.
+    /// </summary>
+    /// <param name="hits">The colliders overlapping the box.</param>
     private void DetectCollisions(out Collider2D[] hits)
     {
         hits = Physics2D.OverlapBoxAll(transform.position, collider.size, 0);
