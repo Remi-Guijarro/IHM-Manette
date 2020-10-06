@@ -567,7 +567,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1177482191, guid: b05129b218949494bbb9dfa3a4dbc62f, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: b05129b218949494bbb9dfa3a4dbc62f, type: 3}
 --- !u!1 &1965663586 stripped
 GameObject:
@@ -575,7 +576,37 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1965663585}
   m_PrefabAsset: {fileID: 0}
---- !u!61 &1965663587
+--- !u!114 &1965663587
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1965663586}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50b9c87b9f5142c41ac76b3a2a3f5755, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 10
+  groundAcceleration: 50
+  groundDeceleration: 80
+  jumpHeight: 5
+  gravity: -9.81
+  airAcceleration: 30
+--- !u!114 &1965663588
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1965663586}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f567152f31b256b4baf16cf5468db9e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!61 &1965663589
 BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

@@ -2,6 +2,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(BoxCollider2D))]
+[RequireComponent(typeof(PlayerInputManager))]
 public class PlayerController2D : MonoBehaviour
 {
     [SerializeField, Tooltip("Maximum speed in u/s.")] 
@@ -27,10 +28,12 @@ public class PlayerController2D : MonoBehaviour
 
     // Cached variables
     BoxCollider2D collider;
+    PlayerInputManager inputManager;
 
     void Awake()
     {
         this.collider = GetComponent<BoxCollider2D>();
+        this.inputManager = GetComponent<PlayerInputManager>();
     }
 
     void Update()
@@ -114,7 +117,7 @@ public class PlayerController2D : MonoBehaviour
     /// </summary>
     private void ComputeXVelocity()
     {
-        float xAxis = Input.GetAxis("Joystick X");
+        float xAxis = inputManager.HorizontalAxis();
 
         float acceleration = this.isGrounded ? this.groundAcceleration : this.airAcceleration;
         float deceleration = this.isGrounded ? this.groundDeceleration : 0;
