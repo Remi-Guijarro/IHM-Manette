@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿
 using UnityEngine;
 
 public class PlayerInputManager : MonoBehaviour
@@ -10,6 +9,8 @@ public class PlayerInputManager : MonoBehaviour
     const string DPAD_Y_AXIS_NAME = "DPad Y";
     const string KEYBOARD_X_AXIS_NAME = "Keyboard X";
     const string KEYBOARD_Y_AXIS_NAME = "Keyboard Y";
+
+    const string JUMP_NAME = "Jump";
 
     public float HorizontalAxis()
     {
@@ -29,5 +30,10 @@ public class PlayerInputManager : MonoBehaviour
         }
         
         return axisValue;
+    }
+
+    public bool Jump()
+    {
+        return Input.GetButtonDown(JUMP_NAME);
     }
 }

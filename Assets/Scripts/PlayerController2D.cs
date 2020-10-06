@@ -64,7 +64,7 @@ public class PlayerController2D : MonoBehaviour
         {
             this.velocity.y = 0;
 
-            if (Input.GetButtonDown("Jump"))
+            if (this.inputManager.Jump())
             {
                 this.velocity.y = Mathf.Sqrt(2 * this.jumpHeight * Mathf.Abs(this.gravity));
             }
