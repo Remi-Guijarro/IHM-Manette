@@ -6,7 +6,10 @@ using UnityEngine;
 public class PlayerController2D : MonoBehaviour
 {
     [SerializeField, Tooltip("Maximum speed in u/s.")] 
-    float speed = 10f;
+    float walkingSpeed = 10f;
+
+    [SerializeField]
+    float sprintingSpeed = 15f;
 
     [SerializeField, Tooltip("Grounded acceleration when the player moves.")]
     float groundAcceleration = 50f;
@@ -25,6 +28,10 @@ public class PlayerController2D : MonoBehaviour
 
     Vector2 velocity;
     bool isGrounded;
+    private bool IsSprinting
+    {
+        get { return inputManager.Sprint(); }
+    }
 
     // Cached variables
     BoxCollider2D collider;
@@ -122,9 +129,11 @@ public class PlayerController2D : MonoBehaviour
         float acceleration = this.isGrounded ? this.groundAcceleration : this.airAcceleration;
         float deceleration = this.isGrounded ? this.groundDeceleration : 0;
 
+        float speed = IsSprinting ? this.sprintingSpeed : this.walkingSpeed;
+
         if (xAxis != 0f)
         {
-            this.velocity.x = Mathf.MoveTowards(this.velocity.x, this.speed * xAxis, acceleration * Time.deltaTime);
+            this.velocity.x = Mathf.MoveTowards(this.velocity.x, speed * xAxis, acceleration * Time.deltaTime);
         }
         else
         {
