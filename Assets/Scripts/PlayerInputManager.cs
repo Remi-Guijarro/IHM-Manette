@@ -3,30 +3,30 @@ using UnityEngine;
 
 public class PlayerInputManager : MonoBehaviour
 {
-    const string JOYSTICK_X_AXIS_NAME = "Joystick X";
-    const string JOYSTICK_Y_AXIS_NAME = "Joystick Y";
-    const string DPAD_X_AXIS_NAME = "DPad X";
-    const string DPAD_Y_AXIS_NAME = "DPad Y";
-    const string KEYBOARD_X_AXIS_NAME = "Keyboard X";
-    const string KEYBOARD_Y_AXIS_NAME = "Keyboard Y";
+    const string JoystickXAxisName = "Joystick X";
+    const string JoystickYAxisName = "Joystick Y";
+    const string DPadXAxisName = "DPad X";
+    const string DPadYAxisName = "DPad Y";
+    const string KeyboardXAxisName = "Keyboard X";
+    const string KeyboardYAxisName = "Keyboard Y";
 
-    const string JUMP_NAME = "Jump";
+    const string JumpName = "Jump";
 
     public float HorizontalAxis()
     {
         float axisValue;
 
-        if (Input.GetAxis(JOYSTICK_X_AXIS_NAME) != 0f)
+        if (Input.GetAxis(JoystickXAxisName) != 0f)
         {
-            axisValue = Input.GetAxis(JOYSTICK_X_AXIS_NAME);
+            axisValue = Input.GetAxis(JoystickXAxisName);
         }
-        else if (Input.GetAxisRaw(DPAD_X_AXIS_NAME) != 0f)
+        else if (Input.GetAxisRaw(DPadXAxisName) != 0f)
         {
-            axisValue = Input.GetAxisRaw(DPAD_X_AXIS_NAME);
+            axisValue = Input.GetAxisRaw(DPadXAxisName);
         }
         else
         {
-            axisValue = Input.GetAxisRaw(KEYBOARD_X_AXIS_NAME);
+            axisValue = Input.GetAxisRaw(KeyboardXAxisName);
         }
         
         return axisValue;
@@ -34,6 +34,6 @@ public class PlayerInputManager : MonoBehaviour
 
     public bool Jump()
     {
-        return Input.GetButtonDown(JUMP_NAME);
+        return Input.GetButtonDown(JumpName);
     }
 }
