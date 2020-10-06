@@ -1,4 +1,5 @@
 ﻿
+using System;
 using UnityEngine;
 
 public class PlayerInputManager : MonoBehaviour
@@ -11,6 +12,7 @@ public class PlayerInputManager : MonoBehaviour
     const string KeyboardYAxisName = "Keyboard Y";
 
     const string JumpName = "Jump";
+    const string SprintName = "Sprint";
 
     public float HorizontalAxis()
     {
@@ -35,5 +37,10 @@ public class PlayerInputManager : MonoBehaviour
     public bool Jump()
     {
         return Input.GetButtonDown(JumpName);
+    }
+
+    internal bool Sprint()
+    {
+        return Input.GetButton(SprintName);
     }
 }
