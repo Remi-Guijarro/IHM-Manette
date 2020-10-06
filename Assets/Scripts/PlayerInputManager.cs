@@ -20,7 +20,7 @@ public class PlayerInputManager : MonoBehaviour
         {
             axisValue = Input.GetAxis(JOYSTICK_X_AXIS_NAME);
         }
-        else if (Input.GetAxisRaw(DPAD_X_AXIS_NAME) != 0)
+        else if (Input.GetAxisRaw(DPAD_X_AXIS_NAME) != 0f)
         {
             axisValue = Input.GetAxisRaw(DPAD_X_AXIS_NAME);
         }
