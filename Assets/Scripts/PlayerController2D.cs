@@ -37,12 +37,13 @@ public class PlayerController2D : MonoBehaviour
     float airAcceleration = 30f;
 
     Vector2 velocity;
+    Coroutine dashCoroutine = null;
     bool isGrounded;
+    bool isDashing;
     private bool IsSprinting
     {
         get { return inputManager.Sprint(); }
     }
-    bool isDashing;
 
     enum Orientation
     {
@@ -96,7 +97,7 @@ public class PlayerController2D : MonoBehaviour
             }
         }
 
-        if (isDashing) return;
+        if (this.isDashing) return;
 
         this.velocity.y += this.gravity * Time.deltaTime;
     }
@@ -119,9 +120,19 @@ public class PlayerController2D : MonoBehaviour
                     transform.Translate(colliderDistance.pointA - colliderDistance.pointB);
 
                     // Ground is defined as any surface < 90° with the world up
-                    if (Vector2.Angle(colliderDistance.normal, Vector2.up) < 90 && this.velocity.y < 0)
+                    if (Vector2.Angle(colliderDistance.normal, Vector2.up) < 90f && this.velocity.y < 0f)
                     {
                         this.isGrounded = true;
+                    }
+                    else
+                    {
+                        if (this.dashCoroutine != null && Vector2.Angle(colliderDistance.normal, Vector2.up) != 180f) // Quick fix to avoid stopping dash when collision with ground detected
+                        {
+                            print("stopping coroutine");
+                            StopCoroutine(this.dashCoroutine);
+                            this.isDashing = false;
+                            this.dashCoroutine = null;
+                        }
                     }
                 }
             }
@@ -156,14 +167,13 @@ public class PlayerController2D : MonoBehaviour
         bool groundCheck = dashJumpingAllowed ? true : this.isGrounded;
         if (groundCheck && !this.isDashing && inputManager.Dash())
         {
-            StartCoroutine(SetDashingState());
+            dashCoroutine = StartCoroutine(SetDashingState());
         }
 
         if (isDashing)
         {
             float orientationValue = (float) this.orientation;
             this.velocity.x = Mathf.Lerp(this.velocity.x, dashSpeed * orientationValue, acceleration * Time.deltaTime);
-            print(Mathf.Lerp(this.velocity.x, dashSpeed * orientationValue, acceleration * Time.deltaTime));
             return;
         }
 
@@ -188,6 +198,7 @@ public class PlayerController2D : MonoBehaviour
         isDashing = true;
         velocity.y = 0;
         yield return new WaitForSeconds(this.dashDuration);
+        dashCoroutine = null;
         isDashing = false;
     }
 
