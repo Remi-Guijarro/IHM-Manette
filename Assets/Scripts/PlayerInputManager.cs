@@ -2,7 +2,7 @@
 using System;
 using UnityEngine;
 
-public class PlayerInputManager : MonoBehaviour
+internal class PlayerInputManager : MonoBehaviour
 {
     const string JoystickXAxisName = "Joystick X";
     const string JoystickYAxisName = "Joystick Y";
@@ -13,8 +13,9 @@ public class PlayerInputManager : MonoBehaviour
 
     const string JumpName = "Jump";
     const string SprintName = "Sprint";
+    const string DashName = "Dash";
 
-    public float HorizontalAxis()
+    internal float HorizontalAxis()
     {
         float axisValue;
 
@@ -47,5 +48,10 @@ public class PlayerInputManager : MonoBehaviour
     internal bool Sprint()
     {
         return Input.GetButton(SprintName);
+    }
+
+    internal bool Dash()
+    {
+        return Input.GetButtonDown(DashName);
     }
 }
