@@ -139,7 +139,7 @@ public class PlayerController2D : MonoBehaviour
         this.isGrounded = false;
         foreach (Collider2D hit in hits)
         {
-            if (hit != this.collider)
+            if (hit != this.collider && !hit.isTrigger)
             {
                 ColliderDistance2D colliderDistance = hit.Distance(this.collider);
                 if (colliderDistance.isOverlapped)
