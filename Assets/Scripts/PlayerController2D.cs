@@ -85,6 +85,7 @@ public class PlayerController2D : MonoBehaviour
 
     void Update()
     {
+        print(velocity.y);
         ComputeXVelocity();
         ComputeYVelocity();
 
@@ -150,12 +151,24 @@ public class PlayerController2D : MonoBehaviour
                     if (Vector2.Angle(colliderDistance.normal, Vector2.up) < 90f && this.velocity.y < 0f)
                     {
                         this.isGrounded = true;
-                    } else {
-                        if(this.velocity.y > 0)
+                    } 
+                    else 
+                    {
+                        if (Vector2.Angle(colliderDistance.normal, Vector2.up) == 90f)
                         {
-                            this.velocity.y = 0;
-                        } 
-                        
+                            if (Input.GetButtonDown("Jump"))
+                            {
+                                print("wall jump");
+                                this.velocity.x = -1* this.velocity.x;
+                                this.velocity.y = Mathf.Sqrt(2 * this.jumpHeight * Mathf.Abs(this.gravity));
+                            }
+                        }
+
+                        if (Vector2.Angle(colliderDistance.normal, Vector2.up) == 180f && this.velocity.y > 0f)
+                        {
+                            this.velocity.y = 0f;
+                        }
+
                         if (this.dashCoroutine != null && Vector2.Angle(colliderDistance.normal, Vector2.up) != 180f) // Quick fix to avoid stopping dash when collision with ground detected
                         {
                             this.velocity.x = 0;
