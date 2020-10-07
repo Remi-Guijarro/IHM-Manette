@@ -73,12 +73,12 @@ public class PlayerController2D : MonoBehaviour
     Orientation orientation = PlayerController2D.Orientation.Right;
 
     // Cached variables
-    BoxCollider2D collider;
+    BoxCollider2D boxCollider;
     PlayerInputManager inputManager;
 
     void Awake()
     {
-        this.collider = GetComponent<BoxCollider2D>();
+        this.boxCollider = GetComponent<BoxCollider2D>();
         this.inputManager = GetComponent<PlayerInputManager>();
     }
 
@@ -152,7 +152,7 @@ public class PlayerController2D : MonoBehaviour
 
     private void ResolveCollisionWith(Collider2D hit)
     {
-        ColliderDistance2D colliderDistance = hit.Distance(this.collider);
+        ColliderDistance2D colliderDistance = hit.Distance(this.boxCollider);
         if (colliderDistance.isOverlapped)
         {
             transform.Translate(colliderDistance.pointA - colliderDistance.pointB);
@@ -209,7 +209,7 @@ public class PlayerController2D : MonoBehaviour
 
     private bool ShouldResolveCollisionWith(Collider2D hit)
     {
-        return hit != this.collider && !hit.isTrigger;
+        return hit != this.boxCollider && !hit.isTrigger;
     }
 
     /// <summary>
@@ -218,7 +218,7 @@ public class PlayerController2D : MonoBehaviour
     /// <param name="hits">The colliders overlapping the box.</param>
     private void DetectCollisions(out Collider2D[] hits)
     {
-        hits = Physics2D.OverlapBoxAll(transform.position, this.collider.size, 0);
+        hits = Physics2D.OverlapBoxAll(transform.position, this.boxCollider.size, 0);
     }
 
     /// <summary>
