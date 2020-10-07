@@ -28,7 +28,7 @@ public class PlayerController2D : MonoBehaviour
     [SerializeField, Tooltip("Grounded deceleration when the player does not input movement.")]
     float groundDeceleration = 80f;
 
-    [SerializeField, Tooltip("Maximum height the player will jump regardless of gravity.")]
+    [SerializeField, Tooltip("Maximum height the player will jump regardless of gravity and on long button press.")]
     float jumpHeight = 5f;
 
     [SerializeField, Tooltip("Gravity applied to the player. Negative = downward gravity. Positive = upward gravity.")]
@@ -111,14 +111,22 @@ public class PlayerController2D : MonoBehaviour
         {
             this.velocity.y = 0;
 
-            if (this.inputManager.Jump())
+            if (this.inputManager.Jump() != 0f)
             {
                 this.velocity.y = Mathf.Sqrt(2 * this.jumpHeight * Mathf.Abs(this.gravity));
             }
         }
-
+        
+        if (this.inputManager.JumpReleased() && Vector2.Dot(this.velocity, Vector2.up) > 0)
+        {
+            float jumpValue = this.inputManager.Jump();
+            // Min threshold to avoid making tiny jumps on button quick release
+            if (jumpValue < .5f) jumpValue = .5f;
+            this.velocity.y *= jumpValue;
+        }
+        
         if (this.IsDashing) return;
-
+        
         this.velocity.y += this.gravity * Time.deltaTime;
     }
 
