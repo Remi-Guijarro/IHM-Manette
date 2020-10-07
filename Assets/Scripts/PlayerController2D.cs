@@ -142,20 +142,23 @@ public class PlayerController2D : MonoBehaviour
             if (hit != this.collider)
             {
                 ColliderDistance2D colliderDistance = hit.Distance(this.collider);
-
                 if (colliderDistance.isOverlapped)
                 {
                     transform.Translate(colliderDistance.pointA - colliderDistance.pointB);
-
+                    
                     // Ground is defined as any surface < 90° with the world up
                     if (Vector2.Angle(colliderDistance.normal, Vector2.up) < 90f && this.velocity.y < 0f)
                     {
                         this.isGrounded = true;
-                    }
-                    else
-                    {
+                    } else {
+                        if(this.velocity.y > 0)
+                        {
+                            this.velocity.y = 0;
+                        } 
+                        
                         if (this.dashCoroutine != null && Vector2.Angle(colliderDistance.normal, Vector2.up) != 180f) // Quick fix to avoid stopping dash when collision with ground detected
                         {
+                            this.velocity.x = 0;
                             this.IsDashing = false;
                         }
                     }
