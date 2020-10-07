@@ -76,7 +76,7 @@ public class PlayerController2D : MonoBehaviour
                 this.velocity.y = Mathf.Sqrt(2 * this.jumpHeight * Mathf.Abs(this.gravity));
             }
         }
-        if (Input.GetButtonUp("Jump") && Vector2.Dot(this.velocity, Vector2.up) > 0)
+        if (this.inputManager.JumpReleased() && Vector2.Dot(this.velocity, Vector2.up) > 0)
         {
             float jumpValue = this.inputManager.Jump();
             // Min threshold to avoid making tiny jumps on button quick release

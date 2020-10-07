@@ -39,6 +39,11 @@ public class PlayerInputManager : MonoBehaviour
         return Input.GetAxis(JumpName);
     }
 
+    public bool JumpReleased()
+    {
+        return Input.GetButtonUp("Jump");   
+    }
+
     internal bool Sprint()
     {
         return Input.GetButton(SprintName);
