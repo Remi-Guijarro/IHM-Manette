@@ -44,7 +44,13 @@ public class PlayerController2D : MonoBehaviour
     }
     bool isDashing;
 
-    int orientation = 1;
+    enum Orientation
+    {
+        Left = -1
+        , Right = 1
+    }
+
+    Orientation orientation = PlayerController2D.Orientation.Left;
 
     // Cached variables
     BoxCollider2D collider;
@@ -154,9 +160,10 @@ public class PlayerController2D : MonoBehaviour
         }
 
         if (isDashing)
-        { 
-            this.velocity.x = Mathf.Lerp(this.velocity.x, dashSpeed * orientation, acceleration * Time.deltaTime);
-            print(Mathf.Lerp(this.velocity.x, dashSpeed * orientation, acceleration * Time.deltaTime));
+        {
+            float orientationValue = (float) this.orientation;
+            this.velocity.x = Mathf.Lerp(this.velocity.x, dashSpeed * orientationValue, acceleration * Time.deltaTime);
+            print(Mathf.Lerp(this.velocity.x, dashSpeed * orientationValue, acceleration * Time.deltaTime));
             return;
         }
 
@@ -172,7 +179,7 @@ public class PlayerController2D : MonoBehaviour
 
     private void UpdatePlayerOrientation(float xAxis)
     {
-        this.orientation = xAxis == 0 ? this.orientation : (int)(xAxis / Math.Abs(xAxis));
+        this.orientation = xAxis == 0 ? this.orientation : (Orientation)(xAxis / Math.Abs(xAxis));
     }
 
     private IEnumerator SetDashingState()
