@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class BottomJumpPlatform : MonoBehaviour
+public class JumpFromBelowPlatform : MonoBehaviour
 {
     BoxCollider2D platform;
 
