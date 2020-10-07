@@ -1,15 +1,25 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(BoxCollider2D))]
 [RequireComponent(typeof(PlayerInputManager))]
 public class PlayerController2D : MonoBehaviour
 {
-    [SerializeField, Tooltip("Maximum speed in u/s.")] 
+    [SerializeField, Tooltip("Maximum walking speed in u/s.")] 
     float walkingSpeed = 10f;
 
-    [SerializeField]
+    [SerializeField, Tooltip("Maximum walking speed in u/s.")]
     float sprintingSpeed = 15f;
+
+    [SerializeField, Tooltip("Dash duration in seconds.")]
+    float dashDuration = .25f;
+
+    [SerializeField, Tooltip("Dash speed in u/s.")]
+    float dashSpeed = 30f;
+
+    [SerializeField]
+    bool dashJumpingAllowed = true;
 
     [SerializeField, Tooltip("Grounded acceleration when the player moves.")]
     float groundAcceleration = 50f;
@@ -20,7 +30,7 @@ public class PlayerController2D : MonoBehaviour
     [SerializeField, Tooltip("Maximum height the player will jump regardless of gravity.")]
     float jumpHeight = 5f;
 
-    [SerializeField, Tooltip("Gravity applied to the player.")]
+    [SerializeField, Tooltip("Gravity applied to the player. Negative = downward gravity. Positive = upward gravity.")]
     float gravity = -9.81f;
 
     [SerializeField, Tooltip("Acceleration while in the air.")]
@@ -32,6 +42,9 @@ public class PlayerController2D : MonoBehaviour
     {
         get { return inputManager.Sprint(); }
     }
+    bool isDashing;
+
+    int orientation = 1;
 
     // Cached variables
     BoxCollider2D collider;
@@ -76,6 +89,8 @@ public class PlayerController2D : MonoBehaviour
                 this.velocity.y = Mathf.Sqrt(2 * this.jumpHeight * Mathf.Abs(this.gravity));
             }
         }
+
+        if (isDashing) return;
 
         this.velocity.y += this.gravity * Time.deltaTime;
     }
@@ -125,11 +140,25 @@ public class PlayerController2D : MonoBehaviour
     private void ComputeXVelocity()
     {
         float xAxis = inputManager.HorizontalAxis();
+        UpdatePlayerOrientation(xAxis);
 
         float acceleration = this.isGrounded ? this.groundAcceleration : this.airAcceleration;
         float deceleration = this.isGrounded ? this.groundDeceleration : 0;
 
         float speed = IsSprinting ? this.sprintingSpeed : this.walkingSpeed;
+
+        bool groundCheck = dashJumpingAllowed ? true : this.isGrounded;
+        if (groundCheck && !this.isDashing && inputManager.Dash())
+        {
+            StartCoroutine(SetDashingState());
+        }
+
+        if (isDashing)
+        { 
+            this.velocity.x = Mathf.Lerp(this.velocity.x, dashSpeed * orientation, acceleration * Time.deltaTime);
+            print(Mathf.Lerp(this.velocity.x, dashSpeed * orientation, acceleration * Time.deltaTime));
+            return;
+        }
 
         if (xAxis != 0f)
         {
@@ -139,6 +168,19 @@ public class PlayerController2D : MonoBehaviour
         {
             this.velocity.x = Mathf.MoveTowards(this.velocity.x, 0, deceleration * Time.deltaTime);
         }
+    }
+
+    private void UpdatePlayerOrientation(float xAxis)
+    {
+        this.orientation = xAxis == 0 ? this.orientation : (int)(xAxis / Math.Abs(xAxis));
+    }
+
+    private IEnumerator SetDashingState()
+    {
+        isDashing = true;
+        velocity.y = 0;
+        yield return new WaitForSeconds(this.dashDuration);
+        isDashing = false;
     }
 
     /// <summary>
