@@ -83,7 +83,7 @@ public class PlayerController2D : MonoBehaviour
             if (jumpValue < .5f) jumpValue = .5f;
             this.velocity.y *= jumpValue;
         }
-            this.velocity.y += this.gravity * Time.deltaTime;
+        this.velocity.y += this.gravity * Time.deltaTime;
     }
 
     /// <summary>

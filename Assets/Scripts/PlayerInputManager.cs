@@ -41,7 +41,7 @@ public class PlayerInputManager : MonoBehaviour
 
     public bool JumpReleased()
     {
-        return Input.GetButtonUp("Jump");   
+        return Input.GetButtonUp(JumpName);   
     }
 
     internal bool Sprint()
