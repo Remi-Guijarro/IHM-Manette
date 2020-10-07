@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Linq.Expressions;
+using System.Runtime.InteropServices.ComTypes;
 using UnityEngine;
 
 [RequireComponent(typeof(BoxCollider2D))]
@@ -85,13 +86,18 @@ public class PlayerController2D : MonoBehaviour
 
     void Update()
     {
-        ComputeXVelocity();
-        ComputeYVelocity();
+        ComputeVelocity();
 
         Collider2D[] hits;
         DetectCollisions(out hits);
         Move();
         ResolveCollisions(hits);
+    }
+
+    private void ComputeVelocity()
+    {
+        ComputeXVelocity();
+        ComputeYVelocity();
     }
 
     /// <summary>
@@ -139,32 +145,73 @@ public class PlayerController2D : MonoBehaviour
         this.isGrounded = false;
         foreach (Collider2D hit in hits)
         {
-            if (hit != this.collider && !hit.isTrigger)
+            if (ShouldResolveCollisionWith(hit))
             {
-                ColliderDistance2D colliderDistance = hit.Distance(this.collider);
-                if (colliderDistance.isOverlapped)
+                ResolveCollisionWith(hit);
+            }
+        }
+    }
+
+    private void ResolveCollisionWith(Collider2D hit)
+    {
+        ColliderDistance2D colliderDistance = hit.Distance(this.collider);
+        if (colliderDistance.isOverlapped)
+        {
+            transform.Translate(colliderDistance.pointA - colliderDistance.pointB);
+
+            if (IsCollidingWithGround(colliderDistance))
+            {
+                this.isGrounded = true;
+            }
+            else if (IsCollidingWithCeiling(colliderDistance))
+            {
+                this.velocity.y = 0;
+
+            }
+            else if (IsCollidingWithWall(colliderDistance)) 
+            {
+                if (IsDashing)
                 {
-                    transform.Translate(colliderDistance.pointA - colliderDistance.pointB);
-                    
-                    // Ground is defined as any surface < 90° with the world up
-                    if (Vector2.Angle(colliderDistance.normal, Vector2.up) < 90f && this.velocity.y < 0f)
-                    {
-                        this.isGrounded = true;
-                    } else {
-                        if(this.velocity.y > 0)
-                        {
-                            this.velocity.y = 0;
-                        } 
-                        
-                        if (this.dashCoroutine != null && Vector2.Angle(colliderDistance.normal, Vector2.up) != 180f) // Quick fix to avoid stopping dash when collision with ground detected
-                        {
-                            this.velocity.x = 0;
-                            this.IsDashing = false;
-                        }
-                    }
+                    this.velocity.x = 0;
+                    this.IsDashing = false;
                 }
             }
         }
+    }
+    
+    /// <summary>
+    /// Walls are defined as any surface of exactly 90° with the world up
+    /// </summary>
+    /// <param name="colliderDistance"></param>
+    /// <returns></returns>
+    private bool IsCollidingWithWall(ColliderDistance2D colliderDistance)
+    {
+        return Vector2.Angle(colliderDistance.normal, Vector2.up) == 90f;
+    }
+
+    /// <summary>
+    /// Ground is defined as any surface < 90° with the world up.
+    /// </summary>
+    /// <param name="colliderDistance">The colliding overlap information.</param>
+    /// <returns>True if the player is colliding with the ground, false otherwise.</returns>
+    private bool IsCollidingWithGround(ColliderDistance2D colliderDistance)
+    {
+        return Vector2.Angle(colliderDistance.normal, Vector2.up) < 90f;
+    }
+
+    /// <summary>
+    /// Ceiling is defined as any surface > 90° with the world up.
+    /// </summary>
+    /// <param name="colliderDistance">The colliding overlap information.</param>
+    /// <returns>True if the player is colliding with the ceiling, false otherwise.</returns>
+    private bool IsCollidingWithCeiling(ColliderDistance2D colliderDistance)
+    {
+        return Vector2.Angle(colliderDistance.normal, Vector2.up) > 90f;
+    }
+
+    private bool ShouldResolveCollisionWith(Collider2D hit)
+    {
+        return hit != this.collider && !hit.isTrigger;
     }
 
     /// <summary>
