@@ -71,13 +71,17 @@ public class PlayerController2D : MonoBehaviour
         {
             this.velocity.y = 0;
 
-            if (this.inputManager.Jump())
+            if (this.inputManager.Jump() != 0f)
             {
                 this.velocity.y = Mathf.Sqrt(2 * this.jumpHeight * Mathf.Abs(this.gravity));
             }
         }
-
-        this.velocity.y += this.gravity * Time.deltaTime;
+        if (Input.GetButtonUp("Jump") && Vector2.Dot(this.velocity, Vector2.up) > 0)
+        {
+            this.velocity.y *= this.inputManager.Jump();
+        }
+            this.velocity.y += this.gravity * Time.deltaTime;
+        print(velocity.y);
     }
 
     /// <summary>
