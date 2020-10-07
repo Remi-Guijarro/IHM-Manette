@@ -497,35 +497,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1965663587, guid: b05129b218949494bbb9dfa3a4dbc62f, type: 3}
-      propertyPath: gravity
-      value: -35
-      objectReference: {fileID: 0}
-    - target: {fileID: 1965663587, guid: b05129b218949494bbb9dfa3a4dbc62f, type: 3}
-      propertyPath: walkingSpeed
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 1965663587, guid: b05129b218949494bbb9dfa3a4dbc62f, type: 3}
-      propertyPath: sprintingSpeed
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 1965663587, guid: b05129b218949494bbb9dfa3a4dbc62f, type: 3}
-      propertyPath: dashDuration
-      value: 0.175
-      objectReference: {fileID: 0}
-    - target: {fileID: 1965663587, guid: b05129b218949494bbb9dfa3a4dbc62f, type: 3}
-      propertyPath: dashSpeed
-      value: 20
-      objectReference: {fileID: 0}
     - target: {fileID: 6253268407511429645, guid: b05129b218949494bbb9dfa3a4dbc62f,
         type: 3}
       propertyPath: m_Name
       value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 6253268407511429645, guid: b05129b218949494bbb9dfa3a4dbc62f,
-        type: 3}
-      propertyPath: m_Layer
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6541192853005775679, guid: b05129b218949494bbb9dfa3a4dbc62f,
         type: 3}

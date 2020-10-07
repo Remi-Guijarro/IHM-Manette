@@ -50,7 +50,7 @@ public class PlayerController2D : MonoBehaviour
         , Right = 1
     }
 
-    Orientation orientation = PlayerController2D.Orientation.Left;
+    Orientation orientation = PlayerController2D.Orientation.Right;
 
     // Cached variables
     BoxCollider2D collider;
@@ -179,7 +179,8 @@ public class PlayerController2D : MonoBehaviour
 
     private void UpdatePlayerOrientation(float xAxis)
     {
-        this.orientation = xAxis == 0 ? this.orientation : (Orientation)(xAxis / Math.Abs(xAxis));
+        this.orientation = xAxis == 0f ? this.orientation : (Orientation)(xAxis / Math.Abs(xAxis));
+        transform.localScale = new Vector3((float) this.orientation, transform.localScale.y, transform.localScale.z);
     }
 
     private IEnumerator SetDashingState()
