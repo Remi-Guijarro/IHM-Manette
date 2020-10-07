@@ -85,7 +85,6 @@ public class PlayerController2D : MonoBehaviour
 
     void Update()
     {
-        print(velocity.y);
         ComputeXVelocity();
         ComputeYVelocity();
 
@@ -152,15 +151,11 @@ public class PlayerController2D : MonoBehaviour
                     {
                         this.isGrounded = true;
                     } 
-                    else 
+                    else
                     {
-                        if (Vector2.Angle(colliderDistance.normal, Vector2.up) == 90f)
+                        if (DoWallJump(colliderDistance))
                         {
-                            if (inputManager.JumpPressed())
-                            {
-                                this.velocity.x = -1* this.velocity.x;
-                                this.velocity.y = Mathf.Sqrt(2 * this.jumpHeight * Mathf.Abs(this.gravity));
-                            }
+                            ComputeWallJumpVelocity();
                         }
 
                         if (Vector2.Angle(colliderDistance.normal, Vector2.up) == 180f && this.velocity.y > 0f)
@@ -177,6 +172,22 @@ public class PlayerController2D : MonoBehaviour
                 }
             }
         }
+    }
+
+    private bool DoWallJump(ColliderDistance2D colliderDistance)
+    {
+        return IsCollidingWithHorizontalSurface(colliderDistance) && inputManager.JumpPressed();
+    }
+
+    private bool IsCollidingWithHorizontalSurface(ColliderDistance2D colliderDistance)
+    {
+        return Vector2.Angle(colliderDistance.normal, Vector2.up) == 90f;
+    }
+
+    private void ComputeWallJumpVelocity()
+    {
+        this.velocity.x = -1 * this.velocity.x;
+        this.velocity.y = Mathf.Sqrt(2 * this.jumpHeight * Mathf.Abs(this.gravity));
     }
 
     /// <summary>
