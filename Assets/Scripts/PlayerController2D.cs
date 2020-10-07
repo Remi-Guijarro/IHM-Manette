@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Linq.Expressions;
 using UnityEngine;
 
 [RequireComponent(typeof(BoxCollider2D))]
@@ -37,9 +38,28 @@ public class PlayerController2D : MonoBehaviour
     float airAcceleration = 30f;
 
     Vector2 velocity;
-    Coroutine dashCoroutine = null;
+    IEnumerator dashCoroutine = null;
     bool isGrounded;
-    bool isDashing;
+    private bool IsDashing
+    {
+        get
+        {
+            return dashCoroutine != null;
+        }
+        set
+        {
+            if (true == value)
+            {
+                this.dashCoroutine = DashCoroutine();
+                StartCoroutine(dashCoroutine);
+            }
+            else if (false == value)
+            {
+                StopCoroutine(this.dashCoroutine);
+                this.dashCoroutine = null;
+            }
+        }
+    }
     private bool IsSprinting
     {
         get { return inputManager.Sprint(); }
@@ -97,7 +117,7 @@ public class PlayerController2D : MonoBehaviour
             }
         }
 
-        if (this.isDashing) return;
+        if (this.IsDashing) return;
 
         this.velocity.y += this.gravity * Time.deltaTime;
     }
@@ -128,9 +148,8 @@ public class PlayerController2D : MonoBehaviour
                     {
                         if (this.dashCoroutine != null && Vector2.Angle(colliderDistance.normal, Vector2.up) != 180f) // Quick fix to avoid stopping dash when collision with ground detected
                         {
-                            print("stopping coroutine");
                             StopCoroutine(this.dashCoroutine);
-                            this.isDashing = false;
+                            this.IsDashing = false;
                             this.dashCoroutine = null;
                         }
                     }
@@ -165,19 +184,17 @@ public class PlayerController2D : MonoBehaviour
         float speed = IsSprinting ? this.sprintingSpeed : this.walkingSpeed;
 
         bool groundCheck = dashJumpingAllowed ? true : this.isGrounded;
-        if (groundCheck && !this.isDashing && inputManager.Dash())
+        if (groundCheck && !this.IsDashing && inputManager.Dash())
         {
-            dashCoroutine = StartCoroutine(SetDashingState());
+            this.IsDashing = true;
         }
 
-        if (isDashing)
+        if (this.IsDashing)
         {
             float orientationValue = (float) this.orientation;
             this.velocity.x = Mathf.Lerp(this.velocity.x, dashSpeed * orientationValue, acceleration * Time.deltaTime);
-            return;
         }
-
-        if (xAxis != 0f)
+        else if (xAxis != 0f)
         {
             this.velocity.x = Mathf.MoveTowards(this.velocity.x, speed * xAxis, acceleration * Time.deltaTime);
         }
@@ -193,13 +210,11 @@ public class PlayerController2D : MonoBehaviour
         transform.localScale = new Vector3((float) this.orientation, transform.localScale.y, transform.localScale.z);
     }
 
-    private IEnumerator SetDashingState()
+    private IEnumerator DashCoroutine()
     {
-        isDashing = true;
         velocity.y = 0;
         yield return new WaitForSeconds(this.dashDuration);
-        dashCoroutine = null;
-        isDashing = false;
+        IsDashing = false;
     }
 
     /// <summary>
