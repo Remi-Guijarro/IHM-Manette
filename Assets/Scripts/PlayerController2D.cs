@@ -148,9 +148,7 @@ public class PlayerController2D : MonoBehaviour
                     {
                         if (this.dashCoroutine != null && Vector2.Angle(colliderDistance.normal, Vector2.up) != 180f) // Quick fix to avoid stopping dash when collision with ground detected
                         {
-                            StopCoroutine(this.dashCoroutine);
                             this.IsDashing = false;
-                            this.dashCoroutine = null;
                         }
                     }
                 }
