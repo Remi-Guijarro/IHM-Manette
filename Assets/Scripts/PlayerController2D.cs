@@ -156,9 +156,8 @@ public class PlayerController2D : MonoBehaviour
                     {
                         if (Vector2.Angle(colliderDistance.normal, Vector2.up) == 90f)
                         {
-                            if (Input.GetButtonDown("Jump"))
+                            if (inputManager.JumpPressed())
                             {
-                                print("wall jump");
                                 this.velocity.x = -1* this.velocity.x;
                                 this.velocity.y = Mathf.Sqrt(2 * this.jumpHeight * Mathf.Abs(this.gravity));
                             }
