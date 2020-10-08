@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections;
-using System.Linq.Expressions;
 using UnityEngine;
 
 [RequireComponent(typeof(BoxCollider2D))]
 [RequireComponent(typeof(PlayerInputManager))]
 public class PlayerController2D : MonoBehaviour
 {
+#region SerializeFields
     [SerializeField, Tooltip("Maximum walking speed in u/s.")] 
     float walkingSpeed = 10f;
 
@@ -36,6 +36,7 @@ public class PlayerController2D : MonoBehaviour
 
     [SerializeField, Tooltip("Acceleration while in the air.")]
     float airAcceleration = 30f;
+#endregion
 
     Vector2 velocity;
     IEnumerator dashCoroutine = null;
@@ -74,24 +75,56 @@ public class PlayerController2D : MonoBehaviour
     Orientation orientation = PlayerController2D.Orientation.Right;
 
     // Cached variables
-    BoxCollider2D collider;
+    BoxCollider2D boxCollider;
     PlayerInputManager inputManager;
 
-    void Awake()
-    {
-        this.collider = GetComponent<BoxCollider2D>();
-        this.inputManager = GetComponent<PlayerInputManager>();
-    }
-
-    void Update()
+    private void ComputeVelocity()
     {
         ComputeXVelocity();
         ComputeYVelocity();
-        Move();
+    }
 
-        Collider2D[] hits;
-        DetectCollisions(out hits);
-        ResolveCollisions(hits);
+    /// <summary>
+    /// Calculates the x velocity to be applied.
+    /// 
+    /// Different acceleration and deceleration is applied depending on
+    /// whether the player is in the air or not, giving a better jump feeling.
+    /// </summary>
+    private void ComputeXVelocity()
+    {
+        float xAxis = inputManager.HorizontalAxis();
+        UpdatePlayerOrientation(xAxis);
+
+        float acceleration = this.isGrounded ? this.groundAcceleration : this.airAcceleration;
+        float deceleration = this.isGrounded ? this.groundDeceleration : 0;
+
+        float speed = IsSprinting ? this.sprintingSpeed : this.walkingSpeed;
+
+        bool groundCheck = dashJumpingAllowed ? true : this.isGrounded;
+        if (groundCheck && !this.IsDashing && inputManager.Dash())
+        {
+            this.IsDashing = true;
+        }
+
+        if (this.IsDashing)
+        {
+            float orientationValue = (float)this.orientation;
+            this.velocity.x = Mathf.Lerp(this.velocity.x, dashSpeed * orientationValue, acceleration * Time.deltaTime);
+        }
+        else if (xAxis != 0f)
+        {
+            this.velocity.x = Mathf.MoveTowards(this.velocity.x, speed * xAxis, acceleration * Time.deltaTime);
+        }
+        else
+        {
+            this.velocity.x = Mathf.MoveTowards(this.velocity.x, 0, deceleration * Time.deltaTime);
+        }
+    }
+
+    private void UpdatePlayerOrientation(float xAxis)
+    {
+        this.orientation = xAxis == 0f ? this.orientation : (Orientation)(xAxis / Math.Abs(xAxis));
+        transform.localScale = new Vector3((float) this.orientation, transform.localScale.y, transform.localScale.z);
     }
 
     /// <summary>
@@ -131,6 +164,23 @@ public class PlayerController2D : MonoBehaviour
     }
 
     /// <summary>
+    /// Detect all collisions with player box collider.
+    /// </summary>
+    /// <param name="hits">The colliders overlapping the box.</param>
+    private void DetectCollisions(out Collider2D[] hits)
+    {
+        hits = Physics2D.OverlapBoxAll(transform.position, this.boxCollider.size, 0);
+    }
+
+    /// <summary>
+    /// Uses velocity to translate player.
+    /// </summary>
+    private void Move()
+    {
+        transform.Translate(this.velocity * Time.deltaTime);
+    }
+
+    /// <summary>
     /// Resolves the collisions by pushing the player out of each collider.
     /// </summary>
     /// <param name="hits">The colliders in contact with the player.</param>
@@ -139,36 +189,44 @@ public class PlayerController2D : MonoBehaviour
         this.isGrounded = false;
         foreach (Collider2D hit in hits)
         {
-            if (hit != this.collider && !hit.isTrigger)
+            if (ShouldResolveCollisionWith(hit))
             {
-                ColliderDistance2D colliderDistance = hit.Distance(this.collider);
-                if (colliderDistance.isOverlapped)
+                ResolveCollisionWith(hit);
+            }
+        }
+    }
+
+    private bool ShouldResolveCollisionWith(Collider2D hit)
+    {
+        return hit != this.boxCollider && !hit.isTrigger;
+    }
+
+    private void ResolveCollisionWith(Collider2D hit)
+    {
+        ColliderDistance2D colliderDistance = hit.Distance(this.boxCollider);
+        if (colliderDistance.isOverlapped)
+        {
+            transform.Translate(colliderDistance.pointA - colliderDistance.pointB);
+
+            if (IsCollidingWithGround(colliderDistance))
+            {
+                this.isGrounded = true;
+            }
+            else if (IsCollidingWithCeiling(colliderDistance))
+            {
+                this.velocity.y = 0;
+
+            }
+            else if (IsCollidingWithWall(colliderDistance)) 
+            {
+                if (IsDashing)
                 {
-                    transform.Translate(colliderDistance.pointA - colliderDistance.pointB);
-                    
-                    // Ground is defined as any surface < 90° with the world up
-                    if (Vector2.Angle(colliderDistance.normal, Vector2.up) < 90f && this.velocity.y < 0f)
-                    {
-                        this.isGrounded = true;
-                    } 
-                    else
-                    {
-                        if (DoWallJump(colliderDistance))
-                        {
-                            ComputeWallJumpVelocity();
-                        }
-
-                        if (Vector2.Angle(colliderDistance.normal, Vector2.up) == 180f && this.velocity.y > 0f)
-                        {
-                            this.velocity.y = 0f;
-                        }
-
-                        if (this.dashCoroutine != null && Vector2.Angle(colliderDistance.normal, Vector2.up) != 180f) // Quick fix to avoid stopping dash when collision with ground detected
-                        {
-                            this.velocity.x = 0;
-                            this.IsDashing = false;
-                        }
-                    }
+                    this.velocity.x = 0;
+                    this.IsDashing = false;
+                }
+                else if (DoWallJump(colliderDistance))
+                {
+                    ComputeWallJumpVelocity();
                 }
             }
         }
@@ -191,55 +249,33 @@ public class PlayerController2D : MonoBehaviour
     }
 
     /// <summary>
-    /// Detect all collisions with player box collider.
+    /// Ground is defined as any surface < 90° with the world up.
     /// </summary>
-    /// <param name="hits">The colliders overlapping the box.</param>
-    private void DetectCollisions(out Collider2D[] hits)
+    /// <param name="colliderDistance">The colliding overlap information.</param>
+    /// <returns>True if the player is colliding with the ground, false otherwise.</returns>
+    private bool IsCollidingWithGround(ColliderDistance2D colliderDistance)
     {
-        hits = Physics2D.OverlapBoxAll(transform.position, this.collider.size, 0);
+        return Vector2.Angle(colliderDistance.normal, Vector2.up) < 90f;
     }
 
     /// <summary>
-    /// Calculates the x velocity to be applied.
-    /// 
-    /// Different acceleration and deceleration is applied depending on
-    /// whether the player is in the air or not, giving a better jump feeling.
+    /// Ceiling is defined as any surface > 90° with the world up.
     /// </summary>
-    private void ComputeXVelocity()
+    /// <param name="colliderDistance">The colliding overlap information.</param>
+    /// <returns>True if the player is colliding with the ceiling, false otherwise.</returns>
+    private bool IsCollidingWithCeiling(ColliderDistance2D colliderDistance)
     {
-        float xAxis = inputManager.HorizontalAxis();
-        UpdatePlayerOrientation(xAxis);
-
-        float acceleration = this.isGrounded ? this.groundAcceleration : this.airAcceleration;
-        float deceleration = this.isGrounded ? this.groundDeceleration : 0;
-
-        float speed = IsSprinting ? this.sprintingSpeed : this.walkingSpeed;
-
-        bool groundCheck = dashJumpingAllowed ? true : this.isGrounded;
-        if (groundCheck && !this.IsDashing && inputManager.Dash())
-        {
-            this.IsDashing = true;
-        }
-
-        if (this.IsDashing)
-        {
-            float orientationValue = (float) this.orientation;
-            this.velocity.x = Mathf.Lerp(this.velocity.x, dashSpeed * orientationValue, acceleration * Time.deltaTime);
-        }
-        else if (xAxis != 0f)
-        {
-            this.velocity.x = Mathf.MoveTowards(this.velocity.x, speed * xAxis, acceleration * Time.deltaTime);
-        }
-        else
-        {
-            this.velocity.x = Mathf.MoveTowards(this.velocity.x, 0, deceleration * Time.deltaTime);
-        }
+        return Vector2.Angle(colliderDistance.normal, Vector2.up) > 90f;
     }
 
-    private void UpdatePlayerOrientation(float xAxis)
+    /// <summary>
+    /// Walls are defined as any surface of exactly 90° with the world up
+    /// </summary>
+    /// <param name="colliderDistance"></param>
+    /// <returns></returns>
+    private bool IsCollidingWithWall(ColliderDistance2D colliderDistance)
     {
-        this.orientation = xAxis == 0f ? this.orientation : (Orientation)(xAxis / Math.Abs(xAxis));
-        transform.localScale = new Vector3((float) this.orientation, transform.localScale.y, transform.localScale.z);
+        return Vector2.Angle(colliderDistance.normal, Vector2.up) == 90f;
     }
 
     private IEnumerator DashCoroutine()
@@ -249,11 +285,21 @@ public class PlayerController2D : MonoBehaviour
         IsDashing = false;
     }
 
-    /// <summary>
-    /// Uses velocity to translate player.
-    /// </summary>
-    private void Move()
+#region Unity
+    void Awake()
     {
-        transform.Translate(this.velocity * Time.deltaTime);
+        this.boxCollider = GetComponent<BoxCollider2D>();
+        this.inputManager = GetComponent<PlayerInputManager>();
     }
+
+    void Update()
+    {
+        ComputeVelocity();
+        Move();
+
+        Collider2D[] hits;
+        DetectCollisions(out hits);
+        ResolveCollisions(hits);
+    }
+#endregion
 }
