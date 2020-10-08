@@ -40,6 +40,11 @@ internal class PlayerInputManager : MonoBehaviour
         return Input.GetAxis(JumpName);
     }
 
+    public bool JumpPressed()
+    {
+        return Input.GetButtonDown(JumpName);
+    }
+
     public bool JumpReleased()
     {
         return Input.GetButtonUp(JumpName);   
