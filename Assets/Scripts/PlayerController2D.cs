@@ -224,22 +224,12 @@ public class PlayerController2D : MonoBehaviour
                     this.velocity.x = 0;
                     this.IsDashing = false;
                 }
-                else if (DoWallJump(colliderDistance))
+                else if (inputManager.JumpPressed())
                 {
                     ComputeWallJumpVelocity();
                 }
             }
         }
-    }
-
-    private bool DoWallJump(ColliderDistance2D colliderDistance)
-    {
-        return IsCollidingWithHorizontalSurface(colliderDistance) && inputManager.JumpPressed();
-    }
-
-    private bool IsCollidingWithHorizontalSurface(ColliderDistance2D colliderDistance)
-    {
-        return Vector2.Angle(colliderDistance.normal, Vector2.up) == 90f;
     }
 
     private void ComputeWallJumpVelocity()
