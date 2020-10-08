@@ -87,10 +87,10 @@ public class PlayerController2D : MonoBehaviour
     {
         ComputeXVelocity();
         ComputeYVelocity();
+        Move();
 
         Collider2D[] hits;
         DetectCollisions(out hits);
-        Move();
         ResolveCollisions(hits);
     }
 
