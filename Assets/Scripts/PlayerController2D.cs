@@ -144,7 +144,7 @@ public class PlayerController2D : MonoBehaviour
         {
             this.velocity.y = 0;
 
-            if (this.inputManager.Jump() != 0f)
+            if (this.inputManager.JumpPressed())
             {
                 this.velocity.y = Mathf.Sqrt(2 * this.jumpHeight * Mathf.Abs(this.gravity));
             }
