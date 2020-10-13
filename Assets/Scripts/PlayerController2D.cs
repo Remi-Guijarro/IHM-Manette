@@ -237,13 +237,29 @@ public class PlayerController2D : MonoBehaviour
                     this.velocity.x = 0;
                     this.IsDashing = false;
                 }
-                else if (inputManager.JumpPressed() && this.wallJumpCount < this.maxWallJumps)
+                else if (inputManager.JumpPressed() 
+                    && this.wallJumpCount < this.maxWallJumps)
                 {
+                    if (TooCloseToTheGround())
+                        return;
+
                     this.wallJumpCount++;
                     ComputeWallJumpVelocity();
                 }
             }
         }
+    }
+
+    private bool TooCloseToTheGround()
+    {
+        const float boxCastEpsilon = 0.1f; // Min acceptable distance to the ground
+        Vector2 playerCenteredBottomPosition = new Vector2(transform.position.x, transform.position.y - this.boxCollider.size.y / 2);
+        Vector2 boxCastSize = new Vector2(this.boxCollider.size.x * .9f, this.boxCollider.size.y); // Slightly narrower to avoid colliding with walls
+
+        RaycastHit2D hit = Physics2D.BoxCast(playerCenteredBottomPosition, boxCastSize, 0f, Vector2.down);
+
+        Debug.Assert(hit.collider != null);
+        return hit.distance < boxCastEpsilon;
     }
 
     private void ApplyWallDrag()
