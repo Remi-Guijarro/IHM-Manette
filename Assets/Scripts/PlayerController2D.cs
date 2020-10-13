@@ -37,6 +37,9 @@ public class PlayerController2D : MonoBehaviour
     [SerializeField, Tooltip("Acceleration while in the air.")]
     float airAcceleration = 30f;
 
+    [SerializeField, Min(0f), Tooltip("Apply multiplier to the player on wall jump. Set to 1.0 to disable this feature.")]
+    float wallJumpBoost = 2f;
+    
     [SerializeField, Min(0f), Tooltip("Maximum number of consecutive walljumps allowed. Set to zero to disable this feature.")]
     int maxWallJumps = 2;
 #endregion
@@ -240,7 +243,7 @@ public class PlayerController2D : MonoBehaviour
 
     private void ComputeWallJumpVelocity()
     {
-        this.velocity.x = -1 * this.velocity.x;
+        this.velocity.x = -1 * this.velocity.x * this.wallJumpBoost;
         this.velocity.y = Mathf.Sqrt(2 * this.jumpHeight * Mathf.Abs(this.gravity));
     }
 
