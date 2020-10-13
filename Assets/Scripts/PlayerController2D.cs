@@ -254,7 +254,7 @@ public class PlayerController2D : MonoBehaviour
     {
         const float boxCastEpsilon = 0.1f; // Min acceptable distance to the ground
         Vector2 playerCenteredBottomPosition = new Vector2(transform.position.x, transform.position.y - this.boxCollider.size.y / 2);
-        Vector2 boxCastSize = new Vector2(this.boxCollider.size.x / 3, this.boxCollider.size.y); // Slightly narrower to avoid colliding with walls
+        Vector2 boxCastSize = new Vector2(this.boxCollider.size.x * .9f, this.boxCollider.size.y); // Slightly narrower to avoid colliding with walls
 
         RaycastHit2D hit = Physics2D.BoxCast(playerCenteredBottomPosition, boxCastSize, 0f, Vector2.down);
 
