@@ -37,6 +37,9 @@ public class PlayerController2D : MonoBehaviour
     [SerializeField, Tooltip("Acceleration while in the air.")]
     float airAcceleration = 30f;
 
+    [SerializeField, Range(0f, 1f), Tooltip("Downward drag force applied on the player when pushing against a wall.")]
+    float wallDrag = 0.2f;
+    
     [SerializeField, Min(0f), Tooltip("Apply multiplier to the player on wall jump. Set to 1.0 to disable this feature.")]
     float wallJumpBoost = 2f;
     
@@ -225,8 +228,10 @@ public class PlayerController2D : MonoBehaviour
                 this.velocity.y = 0;
 
             }
-            else if (IsCollidingWithWall(colliderDistance)) 
+            else if (IsCollidingWithWall(colliderDistance))
             {
+                ApplyWallDrag();
+
                 if (IsDashing)
                 {
                     this.velocity.x = 0;
@@ -239,6 +244,21 @@ public class PlayerController2D : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void ApplyWallDrag()
+    {
+        this.velocity.y *= 1f - this.wallDrag;
+    }
+
+    private bool DoWallJump(ColliderDistance2D colliderDistance)
+    {
+        return IsCollidingWithHorizontalSurface(colliderDistance) && inputManager.JumpPressed();
+    }
+
+    private bool IsCollidingWithHorizontalSurface(ColliderDistance2D colliderDistance)
+    {
+        return Vector2.Angle(colliderDistance.normal, Vector2.up) == 90f;
     }
 
     private void ComputeWallJumpVelocity()
