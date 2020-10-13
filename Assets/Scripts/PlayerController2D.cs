@@ -39,10 +39,14 @@ public class PlayerController2D : MonoBehaviour
 
     [SerializeField, Min(0f), Tooltip("Apply multiplier to the player on wall jump. Set to 1.0 to disable this feature.")]
     float wallJumpBoost = 2f;
+    
+    [SerializeField, Min(0f), Tooltip("Maximum number of consecutive walljumps allowed. Set to zero to disable this feature.")]
+    int maxWallJumps = 2;
 #endregion
 
     Vector2 velocity;
     IEnumerator dashCoroutine = null;
+    int wallJumpCount = 0;
     bool isGrounded;
     private bool IsDashing
     {
@@ -147,7 +151,7 @@ public class PlayerController2D : MonoBehaviour
         {
             this.velocity.y = 0;
 
-            if (this.inputManager.Jump() != 0f)
+            if (this.inputManager.JumpPressed())
             {
                 this.velocity.y = Mathf.Sqrt(2 * this.jumpHeight * Mathf.Abs(this.gravity));
             }
@@ -213,6 +217,7 @@ public class PlayerController2D : MonoBehaviour
 
             if (IsCollidingWithGround(colliderDistance))
             {
+                this.wallJumpCount = 0;
                 this.isGrounded = true;
             }
             else if (IsCollidingWithCeiling(colliderDistance))
@@ -227,22 +232,13 @@ public class PlayerController2D : MonoBehaviour
                     this.velocity.x = 0;
                     this.IsDashing = false;
                 }
-                else if (DoWallJump(colliderDistance))
+                else if (inputManager.JumpPressed() && this.wallJumpCount < this.maxWallJumps)
                 {
+                    this.wallJumpCount++;
                     ComputeWallJumpVelocity();
                 }
             }
         }
-    }
-
-    private bool DoWallJump(ColliderDistance2D colliderDistance)
-    {
-        return IsCollidingWithHorizontalSurface(colliderDistance) && inputManager.JumpPressed();
-    }
-
-    private bool IsCollidingWithHorizontalSurface(ColliderDistance2D colliderDistance)
-    {
-        return Vector2.Angle(colliderDistance.normal, Vector2.up) == 90f;
     }
 
     private void ComputeWallJumpVelocity()
