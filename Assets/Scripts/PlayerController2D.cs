@@ -251,16 +251,6 @@ public class PlayerController2D : MonoBehaviour
         this.velocity.y *= 1f - this.wallDrag;
     }
 
-    private bool DoWallJump(ColliderDistance2D colliderDistance)
-    {
-        return IsCollidingWithHorizontalSurface(colliderDistance) && inputManager.JumpPressed();
-    }
-
-    private bool IsCollidingWithHorizontalSurface(ColliderDistance2D colliderDistance)
-    {
-        return Vector2.Angle(colliderDistance.normal, Vector2.up) == 90f;
-    }
-
     private void ComputeWallJumpVelocity()
     {
         this.velocity.x = -1 * this.velocity.x * this.wallJumpBoost;
