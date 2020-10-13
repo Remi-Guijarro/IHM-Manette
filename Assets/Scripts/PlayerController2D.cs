@@ -36,10 +36,14 @@ public class PlayerController2D : MonoBehaviour
 
     [SerializeField, Tooltip("Acceleration while in the air.")]
     float airAcceleration = 30f;
+
+    [SerializeField, Min(0f), Tooltip("Maximum number of consecutive walljumps allowed. Set to zero to disable this feature.")]
+    int maxWallJumps = 2;
 #endregion
 
     Vector2 velocity;
     IEnumerator dashCoroutine = null;
+    int wallJumpCount = 0;
     bool isGrounded;
     private bool IsDashing
     {
@@ -210,6 +214,7 @@ public class PlayerController2D : MonoBehaviour
 
             if (IsCollidingWithGround(colliderDistance))
             {
+                this.wallJumpCount = 0;
                 this.isGrounded = true;
             }
             else if (IsCollidingWithCeiling(colliderDistance))
@@ -224,22 +229,13 @@ public class PlayerController2D : MonoBehaviour
                     this.velocity.x = 0;
                     this.IsDashing = false;
                 }
-                else if (DoWallJump(colliderDistance))
+                else if (inputManager.JumpPressed() && this.wallJumpCount < this.maxWallJumps)
                 {
+                    this.wallJumpCount++;
                     ComputeWallJumpVelocity();
                 }
             }
         }
-    }
-
-    private bool DoWallJump(ColliderDistance2D colliderDistance)
-    {
-        return IsCollidingWithHorizontalSurface(colliderDistance) && inputManager.JumpPressed();
-    }
-
-    private bool IsCollidingWithHorizontalSurface(ColliderDistance2D colliderDistance)
-    {
-        return Vector2.Angle(colliderDistance.normal, Vector2.up) == 90f;
     }
 
     private void ComputeWallJumpVelocity()
