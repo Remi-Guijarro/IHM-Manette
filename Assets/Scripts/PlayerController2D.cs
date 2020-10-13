@@ -253,8 +253,18 @@ public class PlayerController2D : MonoBehaviour
 
     private void ComputeWallJumpVelocity()
     {
+        CorrectXVelocityOnWallJump();
+
         this.velocity.x = -1 * this.velocity.x * this.wallJumpBoost;
         this.velocity.y = Mathf.Sqrt(2 * this.jumpHeight * Mathf.Abs(this.gravity));
+    }
+
+    private void CorrectXVelocityOnWallJump()
+    {
+        if (this.velocity.x >= this.walkingSpeed)
+        {
+            this.velocity.x = this.walkingSpeed;
+        }
     }
 
     /// <summary>
