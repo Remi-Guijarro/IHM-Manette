@@ -45,6 +45,13 @@ public class PlayerController2D : MonoBehaviour
     
     [SerializeField, Min(0f), Tooltip("Maximum number of consecutive walljumps allowed. Set to zero to disable this feature.")]
     int maxWallJumps = 2;
+    #endregion
+
+#region Feedbacks 
+    [SerializeField]
+    private ParticleSystem dashParticleSystemPrefab;
+    private ParticleSystem dashParticleSystem;
+
 #endregion
 
     Vector2 velocity;
@@ -114,10 +121,12 @@ public class PlayerController2D : MonoBehaviour
         if (groundCheck && !this.IsDashing && inputManager.Dash())
         {
             this.IsDashing = true;
+            var emission = dashParticleSystem.emission;
+            emission.enabled = true;
         }
 
         if (this.IsDashing)
-        {
+        {           
             float orientationValue = (float)this.orientation;
             this.velocity.x = Mathf.Lerp(this.velocity.x, dashSpeed * orientationValue, acceleration * Time.deltaTime);
         }
@@ -236,6 +245,8 @@ public class PlayerController2D : MonoBehaviour
                 {
                     this.velocity.x = 0;
                     this.IsDashing = false;
+                    var emission = dashParticleSystem.emission;
+                    emission.enabled = false;
                 }
                 else if (inputManager.JumpPressed() 
                     && this.wallJumpCount < this.maxWallJumps)
@@ -318,6 +329,8 @@ public class PlayerController2D : MonoBehaviour
         velocity.y = 0;
         yield return new WaitForSeconds(this.dashDuration);
         IsDashing = false;
+        var emission = dashParticleSystem.emission;
+        emission.enabled = false;
     }
 
 #region Unity
@@ -325,6 +338,10 @@ public class PlayerController2D : MonoBehaviour
     {
         this.boxCollider = GetComponent<BoxCollider2D>();
         this.inputManager = GetComponent<PlayerInputManager>();
+        dashParticleSystem = Instantiate(dashParticleSystemPrefab, new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, 1), Quaternion.identity);
+        dashParticleSystem.transform.parent = transform;
+        var emission = dashParticleSystem.emission;
+        emission.enabled = false;
     }
 
     void Update()
