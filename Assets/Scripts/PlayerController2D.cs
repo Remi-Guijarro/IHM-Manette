@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine;
 
+
 [RequireComponent(typeof(BoxCollider2D))]
 [RequireComponent(typeof(PlayerInputManager))]
 public class PlayerController2D : MonoBehaviour
@@ -48,10 +49,7 @@ public class PlayerController2D : MonoBehaviour
     #endregion
 
 #region Feedbacks 
-    [SerializeField]
-    private ParticleSystem dashParticleSystemPrefab;
-    private ParticleSystem dashParticleSystem;
-
+    private FeedbackManager feedbackManager;
 #endregion
 
     Vector2 velocity;
@@ -121,8 +119,7 @@ public class PlayerController2D : MonoBehaviour
         if (groundCheck && !this.IsDashing && inputManager.Dash())
         {
             this.IsDashing = true;
-            var emission = dashParticleSystem.emission;
-            emission.enabled = true;
+            this.feedbackManager.StartFeedbackActionOf(FeedbackManager.CharacterAction.DASH, dashDuration);
         }
 
         if (this.IsDashing)
@@ -245,8 +242,6 @@ public class PlayerController2D : MonoBehaviour
                 {
                     this.velocity.x = 0;
                     this.IsDashing = false;
-                    var emission = dashParticleSystem.emission;
-                    emission.enabled = false;
                 }
                 else if (inputManager.JumpPressed() 
                     && this.wallJumpCount < this.maxWallJumps)
@@ -329,8 +324,6 @@ public class PlayerController2D : MonoBehaviour
         velocity.y = 0;
         yield return new WaitForSeconds(this.dashDuration);
         IsDashing = false;
-        var emission = dashParticleSystem.emission;
-        emission.enabled = false;
     }
 
 #region Unity
@@ -338,10 +331,7 @@ public class PlayerController2D : MonoBehaviour
     {
         this.boxCollider = GetComponent<BoxCollider2D>();
         this.inputManager = GetComponent<PlayerInputManager>();
-        dashParticleSystem = Instantiate(dashParticleSystemPrefab, new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, 1), Quaternion.identity);
-        dashParticleSystem.transform.parent = transform;
-        var emission = dashParticleSystem.emission;
-        emission.enabled = false;
+        this.feedbackManager = GetComponent<FeedbackManager>();
     }
 
     void Update()
