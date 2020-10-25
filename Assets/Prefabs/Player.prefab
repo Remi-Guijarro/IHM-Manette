@@ -230,7 +230,7 @@ MonoBehaviour:
   wallDrag: 0.05
   wallJumpBoost: 2
   maxWallJumps: 2
-  dashParticleSystem: {fileID: 3664856838282478740, guid: 8bcea64066c6af34083ad6197bab2828,
+  dashParticleSystemPrefab: {fileID: 3316666422085722376, guid: 9b2b2d9a58db75c4c9fd7c42094f27ff,
     type: 3}
 --- !u!50 &1246237458
 Rigidbody2D:
