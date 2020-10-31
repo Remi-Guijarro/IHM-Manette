@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine;
 
+
 [RequireComponent(typeof(BoxCollider2D))]
 [RequireComponent(typeof(PlayerInputManager))]
 public class PlayerController2D : MonoBehaviour
@@ -45,6 +46,10 @@ public class PlayerController2D : MonoBehaviour
     
     [SerializeField, Min(0f), Tooltip("Maximum number of consecutive walljumps allowed. Set to zero to disable this feature.")]
     int maxWallJumps = 2;
+    #endregion
+
+#region Feedbacks 
+    private FeedbackManager feedbackManager;
 #endregion
 
     Vector2 velocity;
@@ -114,10 +119,11 @@ public class PlayerController2D : MonoBehaviour
         if (groundCheck && !this.IsDashing && inputManager.Dash())
         {
             this.IsDashing = true;
+            this.feedbackManager.StartFeedbackActionOf(FeedbackManager.CharacterAction.DASH, dashDuration);
         }
 
         if (this.IsDashing)
-        {
+        {           
             float orientationValue = (float)this.orientation;
             this.velocity.x = Mathf.Lerp(this.velocity.x, dashSpeed * orientationValue, acceleration * Time.deltaTime);
         }
@@ -324,6 +330,7 @@ public class PlayerController2D : MonoBehaviour
     {
         this.boxCollider = GetComponent<BoxCollider2D>();
         this.inputManager = GetComponent<PlayerInputManager>();
+        this.feedbackManager = GetComponent<FeedbackManager>();
     }
 
     void Update()
